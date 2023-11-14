@@ -1,0 +1,48 @@
+{
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
+    "file": "assets/bootstrap-icons-4d4572ef.woff",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff"
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2": {
+    "file": "assets/bootstrap-icons-bacd70af.woff2",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
+  },
+  "resources/js/app.css": {
+    "file": "assets/app-342a1a4e.css",
+    "src": "resources/js/app.css"
+  },
+  "resources/js/app.js": {
+    "assets": [
+      "assets/kelkou-14a3f0e1.png",
+      "assets/bootstrap-icons-bacd70af.woff2",
+      "assets/bootstrap-icons-4d4572ef.woff"
+    ],
+    "css": [
+      "assets/app-342a1a4e.css"
+    ],
+    "file": "assets/app-571012c5.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  },
+  "resources/js/src/assets/images/kelkou.png": {
+    "file": "assets/kelkou-14a3f0e1.png",
+    "src": "resources/js/src/assets/images/kelkou.png"
+  },
+  "resources/js/src/assets/images/logo.png": {
+    "file": "assets/logo-0ab34434.png",
+    "src": "resources/js/src/assets/images/logo.png"
+  },
+  "resources/js/src/assets/images/profile.png": {
+    "file": "assets/profile-2ab88d08.png",
+    "src": "resources/js/src/assets/images/profile.png"
+  },
+  "resources/js/src/logo.svg": {
+    "file": "assets/logo-6000b0e9.svg",
+    "src": "resources/js/src/logo.svg"
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-041e359a.css",
+    "isEntry": true,
+    "src": "resources/sass/app.scss"
+  }
+}
