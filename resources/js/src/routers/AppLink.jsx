@@ -2,6 +2,7 @@
 const AppLink = {
     all:"/*",
     login:"/",
+    index:"/",
     dashboard:"/dashboard",
     accueil:"accueil",
     commandes:"commandes",
@@ -15,7 +16,9 @@ const AppLink = {
     notifications:"notifications",
     boiteReception:"boite-reception",
     monCompte:"mon-compte",
-    statistique:"statistique"
+    statistique:"statistique",
+    list:"list",
+    detail:"detail/:slug",
 }
 
 export default AppLink

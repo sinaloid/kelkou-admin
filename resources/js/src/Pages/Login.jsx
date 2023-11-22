@@ -9,8 +9,9 @@ import { useContext, useEffect } from "react";
 import { AppContext } from "../services/context";
 
 const initLogin = {
-  login: "severin.dembele@essitechgroup.com",
-  password: "oyt-IfXY3zVW50X",
+  email: "",
+  number: "",
+  password: "",
 };
 export const Login = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export const Login = () => {
   const formik = useFormik({
     initialValues: initLogin,
     onSubmit: (values) => {
+      values.number = values.email
       console.log(values);
       login(values);
     },
@@ -35,13 +37,14 @@ export const Login = () => {
         onUserChange({
           isAuth: true,
           type: "",
-          //name: res.data.user.nom + " " + res.data.user.prenom,
-          photo: res.data.user.photo,
-          role: res.data.user.role,
+          name: res.data.user.lastname + " " + res.data.user.firstname,
+          photo: res.data.user.image,
+          type: res.data.user.type,
+          slug: res.data.user.slug,
           isActive: res.data.user.isActive,
-          //roles: res.data.roles,
-          token: res.data.accessToken,
-          refreshToken: res.data.refreshToken,
+          role: res.data.user.role,
+          token: res.data.access_token,
+          //refreshToken: res.data.refreshToken,
         });
         isAuth();
       })
@@ -71,7 +74,7 @@ export const Login = () => {
             <Input
               type={"text"}
               placeholder="Email"
-              name={"login"}
+              name={"email"}
               formik={formik}
             />
             <Input
@@ -91,7 +94,7 @@ export const Login = () => {
               administrateur
             </p>
             <p className="position-absolute1 bottom-01 mt-5">
-              © 2023 Mycourses.com. Tous droits reservés.
+              © 2023 KelKou. Tous droits reservés.
             </p>
           </div>
         </div>

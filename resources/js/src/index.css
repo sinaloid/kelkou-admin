@@ -27,6 +27,14 @@ body {
   font-size: 1.25rem;
 }
 
+.fs-30{
+  font-size: 1.875rem;
+}
+
+.fs-40{
+  font-size: 2.5rem;
+}
+
 .bg-gray{
   background-color: var(--gray-color);
 }
@@ -86,3 +94,18 @@ thead{
   color: #fff;
   height: 56px;
 }*/
+
+.text-200,.text-100 {
+  white-space: nowrap; /* Empêche le texte de passer à la ligne */
+  overflow: hidden; /* Masque le contenu débordant du conteneur */
+  text-overflow: ellipsis; /* Affiche "..." à la fin du texte masqué */
+}
+
+.text-200 {
+  width: 200px; /* Largeur de votre conteneur de texte */
+}
+
+.text-100 {
+  width: 200px; /* Largeur de votre conteneur de texte */
+}
+

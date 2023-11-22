@@ -6,259 +6,533 @@ import { PrevIcon } from "../assets/icons/PrevIcon";
 import { SearchIcon } from "../assets/icons/SearchIcon";
 import { SuivIcon } from "../assets/icons/SuivIcon";
 import endPoint from "../services/endPoint";
-import request from "../services/request";
+import request, { URL } from "../services/request";
 import { Input } from "../components/Input";
 import { useFormik } from "formik";
 import { pagination } from "../services/function";
 
-const initProduit = {
-  label: "",
-  code: "",
-  description: "",
-  categories: "",
-  prix: "",
-  image: "",
-  boutiqueId: 1,
+const initData = {
+    nom: "",
+    prix: "",
+    stock: "",
+    image: "",
+    disponibilite: "",
+    dure_livraison: "",
+    description: "",
+    partenaire: "",
+    categorie: "",
 };
 export const Produit = () => {
-  const [datas, setDatas] = useState({
-    all: [],
-    small: [],
-  });
-  const [categories, setCategories] = useState([]);
-  const [pages, setPages] = useState({
-    list: [],
-    counter: 0,
-    index: 0,
-  });
-  const close = useRef();
-  useEffect(() => {
-    get();
-    getCategories();
-  }, []);
-  const formik = useFormik({
-    initialValues: initProduit,
-    onSubmit: (values) => {
-      console.log(values);
-      post(values);
-    },
-  });
-  const get = () => {
-    request
-      .get(endPoint.produits + "/1/boutiques")
-      .then((res) => {
-        const tab = pagination(res.data.produits.data, 10);
-
-        console.log(tab);
-
-        if (tab.counter !== 0) {
-          setDatas({
-            all: res.data.produits.data,
-            small: tab.list[0],
-          });
-          setPages(tab);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const post = (values) => {
-    request
-      .post(endPoint.produits, values)
-      .then((res) => {
-        console.log(res.data);
-        close.current.click();
+    const [datas, setDatas] = useState({
+        all: [],
+        small: [],
+    });
+    const [pages, setPages] = useState({
+        list: [],
+        counter: 0,
+        index: 0,
+    });
+    const [categories, setCategories] = useState([]);
+    const close = useRef();
+    const closeDelete = useRef();
+    const [detail, setDetail] = useState("");
+    const [viewData, setViewData] = useState({});
+    const [partenaires, setPartenaires] = useState([])
+    useEffect(() => {
         get();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const getCategories = () => {
-    request
-      .get(endPoint.categories)
-      .then((res) => {
-        console.log(res.data.categories.data);
-        setCategories(res.data.categories.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+        getCategorie();
+        getPartenaire()
+    }, []);
+    const formik = useFormik({
+        initialValues: initData,
+        onSubmit: (values) => {
+            console.log(values);
+            if (values.slug) {
+                update(values);
+            } else {
+                
+                post(values);
+            }
+        },
+    });
 
-  const changePage = (e, values) => {
-    e.preventDefault();
-    const pageNumber = pages.index + parseInt(values);
-    console.log(pageNumber);
-    if (pageNumber >= 0 && pageNumber < pages.counter) {
-      setPages({ ...pages, index: pageNumber });
-      setDatas({
-        ...datas,
-        small: pages.list[pageNumber],
-      });
-    }
-  };
-  return (
-    <>
-      <div className="row mb-3">
-        <div className="col-12">
-          <h1 className="text-start mb-3">Mes produits</h1>
-          <div className="d-flex">
-            <div className="d-flex align-items-center me-auto">
-              <div>
-                <div className="input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Rechercher..."
-                  />
-                  <span className="input-group-text">
-                    <SearchIcon />
-                  </span>
-                </div>
-              </div>
-              <div>
-                <span className="ms-2" onClick={(e) => changePage(e, "-1")}>
-                  <PrevIcon />
-                </span>
-                <span className="ms-2" onClick={(e) => changePage(e, "+1")}>
-                  <SuivIcon />
-                </span>
-              </div>
-              <span className="fw-bold">
-                Page {pages.index + 1} / {pages.list.length}
-              </span>
-            </div>
-            <div>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#produit"
-              >
-                Ajouter
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="row row-cols-12 row-cols-md-4 g-4">
-        {[...Array(11).keys()].map((data, idx) => {
-          return (
-            <div className="col mb-3" key={idx}>
-              <div className="card">
-                <div className="position-relative">
-                <img
-                  width={"100%"}
-                  src={
-                    "https://source.unsplash.com/random/800x800/?product=" + idx
-                  }
-                />
-                <span className="position-absolute bg-primary px-1 fw-bold" style={{right:"0", top:"0"}}>Stock 15</span>
-                </div>
-                <div className="p-2">
-                <span className="d-block fs-18 text-start">Nom du produit</span>
-                <span className="d-block fs-10 text-start">
-                  Nom de la catégorie
-                </span>
-                <span className="d-block fs-18 text-start">Xof 1500</span>
-                <div className="d-flex">
-                  <span className="ms-auto btn btn-primary mx-1">
-                    <i class="bi bi-eye"></i>
-                  </span>
-                  <span className="btn btn-warning mx-1">
-                    <i class="bi bi-pencil-square"></i>
-                  </span>
-                  <span className="btn btn-danger mx-1 ">
-                    <i class="bi bi-trash"></i>
-                  </span>
-                </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+    const get = () => {
+        request
+            .get(endPoint.produits)
+            .then((res) => {
+                console.log(res.data.data);
+                setDetail(res.data.data);
+                const tab = pagination(res.data.data, 10);
 
-      <div
-        className="modal fade"
-        id="produit"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Ajout d'un nouveau produit
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+                //console.log(tab);
+
+                if (tab.counter !== 0) {
+                    setDatas({
+                        all: res.data.data,
+                        small: tab.list[0],
+                    });
+                    setPages(tab);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const getCategorie = () => {
+        request
+            .get(endPoint.categories)
+            .then((res) => {
+                console.log(res.data.data);
+                setCategories(res.data.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+    const getPartenaire = () => {
+      request
+          .get(endPoint.partenaires)
+          .then((res) => {
+              console.log(res.data.data);
+              setPartenaires(res.data.data);
+          })
+          .catch((error) => {
+              console.log(error);
+          });
+  };
+    const post = (values) => {
+        request
+            .post(endPoint.produits, values)
+            .then((res) => {
+                console.log(res.data);
+                close.current.click();
+                get();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const update = (values) => {
+        console.log(values);
+        request
+            .post(endPoint.produits + "/" + values.slug, values)
+            .then((res) => {
+                console.log(res.data);
+                close.current.click();
+                get();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const destroy = () => {
+        request
+            .delete(endPoint.produits + "/" + viewData.slug)
+            .then((res) => {
+                console.log(res.data);
+                closeDelete.current.click();
+                get();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const changePage = (e, values) => {
+        e.preventDefault();
+        const pageNumber = pages.index + parseInt(values);
+        console.log(pageNumber);
+        if (pageNumber >= 0 && pageNumber < pages.counter) {
+            setPages({ ...pages, index: pageNumber });
+            setDatas({
+                ...datas,
+                small: pages.list[pageNumber],
+            });
+        }
+    };
+
+    const onSelectData = (e, data) => {
+        e.preventDefault();
+        setViewData(data);
+    };
+
+    const editData = (e, data) => {
+        e.preventDefault();
+        console.log(data);
+        formik.setFieldValue("_method", "put");
+        formik.setFieldValue("slug", data.slug);
+        formik.setFieldValue("nom", data.nom);
+        formik.setFieldValue("prix", data.prix);
+        formik.setFieldValue("stock", data.stock);
+        formik.setFieldValue("disponibilite", data.disponibilite);
+        formik.setFieldValue("dure_livraison", data.dure_livraison);
+        formik.setFieldValue("categorie", data.categorie.slug);
+        formik.setFieldValue("description", data.description);
+    };
+    return (
+        <>
+            <div className="row mb-3">
+                <div className="col-12">
+                    <h1 className="text-start mb-3">Mes produits</h1>
+                    <div className="d-flex">
+                        <div className="d-flex align-items-center me-auto">
+                            <div>
+                                <div className="input-group">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Rechercher..."
+                                    />
+                                    <span className="input-group-text">
+                                        <SearchIcon />
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <span
+                                    className="ms-2"
+                                    onClick={(e) => changePage(e, "-1")}
+                                >
+                                    <PrevIcon />
+                                </span>
+                                <span
+                                    className="ms-2"
+                                    onClick={(e) => changePage(e, "+1")}
+                                >
+                                    <SuivIcon />
+                                </span>
+                            </div>
+                            <span className="fw-bold">
+                                Page {pages.index + 1} / {pages.list.length}
+                            </span>
+                        </div>
+                        <div>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#produit"
+                                onClick={e => formik.resetForm()}
+                            >
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="modal-body">
-              <Input
-                type={"text"}
-                placeholder="Label du produit"
-                name={"label"}
-                formik={formik}
-              />
-              <Input
-                type={"text"}
-                placeholder="Code du produit"
-                name={"code"}
-                formik={formik}
-              />
-              <Input
-                type={"text"}
-                placeholder="Description du produit"
-                name={"description"}
-                formik={formik}
-              />
-              <Input
-                type={"text"}
-                placeholder="Prix du produit"
-                name={"prix"}
-                formik={formik}
-              />
-              <Input
-                type={"select"}
-                placeholder="categories du produit"
-                name={"categories"}
-                formik={formik}
-                options={categories}
-              />
-              <Input
-                type={"file"}
-                placeholder="image du produit"
-                name={"image"}
-                formik={formik}
-              />
+            <div className="row row-cols-12 row-cols-md-4 g-4">
+                {datas.small.map((data, idx) => {
+                    return (
+                        <div className="col mb-3" key={idx}>
+                            <div className="card">
+                                <div className="position-relative">
+                                    <img
+                                        width={"100%"}
+                                        src={URL + data.image}
+                                    />
+                                    <span
+                                        className="position-absolute bg-primary px-1 fw-bold"
+                                        style={{ right: "0", top: "0" }}
+                                    >
+                                        Stock {data.stock}
+                                    </span>
+                                </div>
+                                <div className="p-2">
+                                    <span className="d-block fs-18 text-start">
+                                        {data.nom}
+                                    </span>
+                                    <span className="d-block fs-10 text-start">
+                                        {data.categorie.nom}
+                                    </span>
+                                    <span className="d-block fs-18 text-start">
+                                        Xof {data.prix}
+                                    </span>
+                                    <div className="d-flex">
+                                        <span
+                                            className="ms-auto btn btn-primary mx-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#view"
+                                            onClick={(e) =>
+                                                onSelectData(e, data)
+                                            }
+                                        >
+                                            <i class="bi bi-eye"></i>
+                                        </span>
+                                        <span
+                                            className="btn btn-warning mx-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#produit"
+                                            onClick={(e) => editData(e, data)}
+                                        >
+                                            <i class="bi bi-pencil-square"></i>
+                                        </span>
+                                        <span
+                                            className="btn btn-danger mx-1 "
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#delete"
+                                            onClick={(e) =>
+                                                onSelectData(e, data)
+                                            }
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Annuler
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={formik.handleSubmit}
-              >
-                Enregistrer
-              </button>
+
+            <div
+                className="modal fade"
+                id="produit"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1
+                                className="modal-title fs-5"
+                                id="exampleModalLabel"
+                            >
+                                Ajout d'un nouveau produit
+                            </h1>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div className="modal-body">
+                            <Input
+                                type={"text"}
+                                placeholder="Nom du produit"
+                                name={"nom"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Prix du produit"
+                                name={"prix"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Quantité en stock"
+                                name={"stock"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Dure de livraison du produit"
+                                name={"dure_livraison"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"select"}
+                                placeholder="Disponibilié du produit"
+                                name={"disponibilite"}
+                                formik={formik}
+                                options={[
+                                    { slug: "immediate", nom: "Immediate" },
+                                    {
+                                        slug: "sur commande",
+                                        nom: "Sur commande",
+                                    },
+                                ]}
+                            />
+                            <Input
+                                type={"select-partenaire"}
+                                placeholder="Propriétaire du produit"
+                                name={"partenaire"}
+                                formik={formik}
+                                options={partenaires}
+                            />
+                            <Input
+                                type={"select2"}
+                                placeholder="Catégorie du produit"
+                                name={"categorie"}
+                                formik={formik}
+                                options={categories}
+                            />
+                            <Input
+                                type={"file"}
+                                placeholder="Image du produit"
+                                name={"image"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"textarea"}
+                                placeholder="Description du produit"
+                                name={"description"}
+                                formik={formik}
+                            />
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                                ref={close}
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={formik.handleSubmit}
+                            >
+                                Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+            <div
+                className="modal fade"
+                id="delete"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1
+                                className="modal-title fs-5"
+                                id="exampleModalLabel"
+                            >
+                                Supprimer les données
+                            </h1>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div className="modal-body text-start">
+                            Voulez-vous continuer ?
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                                ref={closeDelete}
+                            >
+                                Non
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={destroy}
+                            >
+                                Oui
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="modal fade modal-lg" id="view">
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1
+                                className="modal-title fs-5"
+                                id="exampleModalLabel"
+                            >
+                                Détails
+                            </h1>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div className="modal-body text-start">
+                            <div className="d-flex">
+                                <img
+                                    width={"180px"}
+                                    height={"180px"}
+                                    src={URL + viewData.image}
+                                    alt=""
+                                />
+                                <div className="ps-3 w-100">
+                                    <div className="d-flex align-items-center">
+                                        <div>
+                                            <span className="fw-bold fs-20">
+                                                {viewData.nom}
+                                            </span>
+                                            <br />
+                                            <span className="text-muted">
+                                                {viewData.categorie?.nom}
+                                            </span>
+                                        </div>
+                                        <div className="ms-auto">
+                                            <span>Créer le : </span>
+                                            <span className="text-muted ms-auto">
+                                                {new Date(
+                                                    viewData.created_at
+                                                ).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div>
+                                        <span>Prix : </span>
+                                        <span className="fw-bold">
+                                            {viewData.prix + " Xof"}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span>Stock : </span>
+                                        <span className="fw-bold">
+                                            {viewData.stock}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span>Disponiblilité : </span>
+                                        <span className="fw-bold">
+                                            {viewData.disponibilite}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span>Durée de la livraison : </span>
+                                        <span className="fw-bold">
+                                            {viewData.dure_livraison +
+                                                " jour(s)"}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="fw-bold">
+                                            Description :{" "}
+                                        </span>
+                                        <p>{viewData.description}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                data-bs-dismiss="modal"
+                            >
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 };

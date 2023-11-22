@@ -1,7 +1,13 @@
 const endPoint = {
-  login: "api/security/login",
-  produits:"/api/produits",
-  categories:"/api/categories"
+  login: "login",
+  register: "register",
+  categories:"categories",
+  partenaires:"partenaires",
+  produits:"produits",
+  commandes:"commandes",
+  users:"users"
+
+
 };
 
 export default endPoint;
