@@ -15,12 +15,18 @@ import { useNavigate } from "react-router-dom";
 const initData = {
     nom_responsable: "",
     email_responsable: "",
-    telephone_responsable: "",
+    telephone_responsable_1: "",
+    telephone_responsable_2: "",
+    telephone_responsable_3: "",
     nom_boutique: "",
     email_boutique: "",
-    telephone_boutique: "",
+    telephone_boutique_1: "",
+    telephone_boutique_2: "",
+    telephone_boutique_3: "",
     latitude: "",
     longitute: "",
+    heure_ouverture: "",
+    heure_fermeture: "",
     image: "",
     description: "",
 };
@@ -139,12 +145,18 @@ export const ListPartenaire = () => {
         formik.setFieldValue("slug", data.slug);
         formik.setFieldValue("nom_responsable", data.nom_responsable);
         formik.setFieldValue("email_responsable", data.email_responsable);
-        formik.setFieldValue("telephone_responsable", data.telephone_responsable);
+        formik.setFieldValue("telephone_responsable_1", data.telephone_responsable_1);
+        formik.setFieldValue("telephone_responsable_2", data.telephone_responsable_2);
+        formik.setFieldValue("telephone_responsable_3", data.telephone_responsable_3);
         formik.setFieldValue("nom_boutique", data.nom_boutique);
         formik.setFieldValue("email_boutique", data.email_boutique);
-        formik.setFieldValue("telephone_boutique", data.telephone_boutique);
+        formik.setFieldValue("telephone_boutique_1", data.telephone_boutique_1);
+        formik.setFieldValue("telephone_boutique_2", data.telephone_boutique_2);
+        formik.setFieldValue("telephone_boutique_3", data.telephone_boutique_3);
         formik.setFieldValue("latitude", data.latitude);
         formik.setFieldValue("longitute", data.longitute);
+        formik.setFieldValue("heure_ouverture", data.heure_ouverture);
+        formik.setFieldValue("heure_fermeture", data.heure_fermeture);
         formik.setFieldValue("description", data.description);
     };
 
@@ -234,7 +246,7 @@ export const ListPartenaire = () => {
                                             </div>
                                         </td>
                                         <td>
-                                            {data.telephone_boutique}
+                                            {data.telephone_boutique_1}
                                         </td>
                                         <td>
                                             <p className="text-200">
@@ -325,8 +337,20 @@ export const ListPartenaire = () => {
                             
                             <Input
                                 type={"text"}
-                                placeholder="Téléphone du responsable"
-                                name={"telephone_responsable"}
+                                placeholder="Téléphone 1 du responsable"
+                                name={"telephone_responsable_1"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Téléphone 2 du responsable"
+                                name={"telephone_responsable_2"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Téléphone 3 du responsable"
+                                name={"telephone_responsable_3"}
                                 formik={formik}
                             />
                             <Input
@@ -343,8 +367,32 @@ export const ListPartenaire = () => {
                             />
                             <Input
                                 type={"text"}
-                                placeholder="Téléphone de la boutique"
-                                name={"telephone_boutique"}
+                                placeholder="Téléphone 1 de la boutique"
+                                name={"telephone_boutique_1"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Téléphone 2 de la boutique"
+                                name={"telephone_boutique_2"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Téléphone 3 de la boutique"
+                                name={"telephone_boutique_3"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"time"}
+                                placeholder="Téléphone 3 de la boutique"
+                                name={"heure_ouverture"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"time"}
+                                placeholder="Téléphone 3 de la boutique"
+                                name={"heure_fermeture"}
                                 formik={formik}
                             />
                             <Input

@@ -17,10 +17,18 @@ return new class extends Migration
             $table->id();
             $table->string('nom_responsable');
             $table->string('email_responsable')->nullable();
-            $table->string('telephone_responsable');
+            $table->string('telephone_responsable_1')->nullable();
+            $table->string('telephone_responsable_2')->nullable();
+            $table->string('telephone_responsable_3')->nullable();
             $table->string('nom_boutique');
             $table->string('email_boutique')->nullable();
-            $table->string('telephone_boutique');
+            $table->string('telephone_boutique_1')->nullable();
+            $table->string('telephone_boutique_2')->nullable();
+            $table->string('telephone_boutique_3')->nullable();
+            
+            $table->string('heure_ouverture')->nullable();
+            $table->string('heure_fermeture')->nullable();
+
             $table->string('latitude')->nullable();
             $table->string('longitute')->nullable();
             $table->string('slug');

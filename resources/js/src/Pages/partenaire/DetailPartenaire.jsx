@@ -11,6 +11,9 @@ import { Input } from "../../components/Input";
 import { useFormik } from "formik";
 import { pagination } from "../../services/function";
 import { useParams } from "react-router-dom";
+import { Video } from "../../components/Video";
+import ReactPlayer from "react-player";
+import rect from "../../assets/images/rect.png";
 
 const initData = {
     nom: "",
@@ -37,8 +40,9 @@ export const DetailPartenaire = () => {
     const close = useRef();
     const closeDelete = useRef();
     const [detail, setDetail] = useState("");
-    const [viewData, setViewData] = useState({});
+    const [viewData, setViewData] = useState({ produit_images: [] });
     const { slug } = useParams();
+    const [viewVideo, setViewVideo] = useState(false);
     useEffect(() => {
         get();
         getCategorie();
@@ -104,7 +108,7 @@ export const DetailPartenaire = () => {
     };
 
     const update = (values) => {
-        console.log(values)
+        console.log(values);
         request
             .post(endPoint.produits + "/" + values.slug, values)
             .then((res) => {
@@ -145,12 +149,14 @@ export const DetailPartenaire = () => {
 
     const onSelectData = (e, data) => {
         e.preventDefault();
+        //setVideoUrl(URL + data.video);
+        console.log(data);
         setViewData(data);
     };
 
     const editData = (e, data) => {
         e.preventDefault();
-        console.log(data)
+        console.log(data);
         formik.setFieldValue("_method", "put");
         formik.setFieldValue("slug", data.slug);
         formik.setFieldValue("nom", data.nom);
@@ -189,9 +195,18 @@ export const DetailPartenaire = () => {
                                 </span>{" "}
                                 <br />
                                 <span>Téléphone boutique : </span>
-                                <span className="fw-bold">
-                                    {detail.telephone_boutique}
-                                </span>{" "}
+                                <div className="fw-bold">
+                                    <span>{detail.telephone_boutique_1}</span>{" "}
+                                    <br />
+                                    <span>
+                                        {detail.telephone_boutique_2}
+                                    </span>{" "}
+                                    <br />
+                                    <span>
+                                        {detail.telephone_boutique_3}
+                                    </span>{" "}
+                                    <br />
+                                </div>{" "}
                             </div>
                         </div>
                         <div className="me-3 text-start">
@@ -210,10 +225,21 @@ export const DetailPartenaire = () => {
                                     {detail.email_responsable}
                                 </span>{" "}
                                 <br />
-                                <span>Téléphone responsable: </span>
-                                <span className="fw-bold">
-                                    {detail.telephone_responsable}
-                                </span>{" "}
+                                <div className="">Téléphone responsable: </div>
+                                <div className="d-inline-block fw-bold">
+                                    <span>
+                                        {detail.telephone_responsable_1}
+                                    </span>{" "}
+                                    <br />
+                                    <span>
+                                        {detail.telephone_responsable_2}
+                                    </span>{" "}
+                                    <br />
+                                    <span>
+                                        {detail.telephone_responsable_3}
+                                    </span>{" "}
+                                    <br />
+                                </div>{" "}
                             </div>
                         </div>
                     </div>
@@ -222,6 +248,20 @@ export const DetailPartenaire = () => {
                     <div className="text-muted">
                         Créer le :{" "}
                         {new Date(detail.created_at).toLocaleDateString()}
+                    </div>
+                    <div>
+                        <div className="d-inline-block me-2">
+                            <span>Heure début : </span>{" "}
+                            <span className="fw-bold">
+                                {detail.heure_ouverture}
+                            </span>
+                        </div>
+                        <div className="d-inline-block me-2">
+                            <span>Heure femeture : </span>{" "}
+                            <span className="fw-bold">
+                                {detail.heure_fermeture}
+                            </span>
+                        </div>
                     </div>
                     <p className="text-start">{detail.description}</p>
                 </div>
@@ -285,6 +325,7 @@ export const DetailPartenaire = () => {
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Catégories</th>
+                                <th scope="col">Quantité min</th>
                                 <th scope="col">Description</th>
                                 <th scope="col">Date</th>
                                 <th scope="col">Action</th>
@@ -295,6 +336,10 @@ export const DetailPartenaire = () => {
                                 if (data.is_deleted) {
                                     return null;
                                 }
+                                const img =
+                                    data.produit_images.length !== 0
+                                        ? URL + data.produit_images[0].url
+                                        : rect;
                                 return (
                                     <tr key={idx}>
                                         <th scope="row">{idx + 1}</th>
@@ -302,13 +347,18 @@ export const DetailPartenaire = () => {
                                             <div className="d-flex">
                                                 <img
                                                     width={"64px"}
-                                                    src={URL + data.image}
+                                                    src={img}
                                                     alt=""
                                                 />
                                                 <div className="text-100">
                                                     {data.nom}
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <p className="text-200">
+                                                {data.quantite_min}
+                                            </p>
                                         </td>
                                         <td>
                                             <p className="text-200">
@@ -411,6 +461,12 @@ export const DetailPartenaire = () => {
                                 formik={formik}
                             />
                             <Input
+                                type={"text"}
+                                placeholder="Quantite minimum du produit"
+                                name={"quantite_min"}
+                                formik={formik}
+                            />
+                            <Input
                                 type={"select"}
                                 placeholder="Disponibilié du produit"
                                 name={"disponibilite"}
@@ -431,9 +487,17 @@ export const DetailPartenaire = () => {
                                 options={categories}
                             />
                             <Input
+                                type={"files"}
+                                label="Images du produit"
+                                placeholder="Images du produit"
+                                name={"files"}
+                                formik={formik}
+                            />
+                            <Input
                                 type={"file"}
-                                placeholder="Image du produit"
-                                name={"image"}
+                                label="Courte video du produit"
+                                placeholder="Courte video du produit"
+                                name={"video"}
                                 formik={formik}
                             />
                             <Input
@@ -527,22 +591,32 @@ export const DetailPartenaire = () => {
                             ></button>
                         </div>
                         <div className="modal-body text-start">
-                            <div className="d-flex">
-                                <img
-                                    width={"180px"}
-                                    height={"180px"}
-                                    src={URL + viewData.image}
-                                    alt=""
-                                />
+                            <div className="d-flex1">
+                                <div className="d-flex flex-wrap mb-3">
+                                    {viewData.produit_images.map((data) => {
+                                        return (
+                                            <span className="me-2">
+                                                <img
+                                                    width={"180px"}
+                                                    height={"180px"}
+                                                    src={URL + data.url}
+                                                    alt=""
+                                                />
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+
                                 <div className="ps-3 w-100">
                                     <div className="d-flex align-items-center">
                                         <div>
-                                        <span className="fw-bold fs-20">
-                                            {viewData.nom}
-                                        </span><br/>
-                                        <span className="text-muted">
-                                            {viewData.categorie?.nom}
-                                        </span>
+                                            <span className="fw-bold fs-20">
+                                                {viewData.nom}
+                                            </span>
+                                            <br />
+                                            <span className="text-muted">
+                                                {viewData.categorie?.nom}
+                                            </span>
                                         </div>
                                         <div className="ms-auto">
                                             <span>Créer le : </span>
@@ -567,6 +641,13 @@ export const DetailPartenaire = () => {
                                         </span>
                                     </div>
                                     <div>
+                                        <span>Quantité min : </span>
+                                        <span className="fw-bold">
+                                            {viewData.quantite_min +
+                                                " produit(s)"}
+                                        </span>
+                                    </div>
+                                    <div>
                                         <span>Disponiblilité : </span>
                                         <span className="fw-bold">
                                             {viewData.disponibilite}
@@ -585,6 +666,16 @@ export const DetailPartenaire = () => {
                                         </span>
                                         <p>{viewData.description}</p>
                                     </div>
+                                </div>
+
+                                <div>
+                                    {viewData.video && (
+                                        <ReactPlayer
+                                            url={URL + viewData.video}
+                                            controls={true}
+                                            width={"100%"}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>

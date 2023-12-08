@@ -43,12 +43,18 @@ class PartenaireController extends Controller
         $validator = Validator::make($request->all(), [
             'nom_responsable' => 'required|string|max:255',
             'email_responsable' => 'nullable|string|email|max:255',
-            'telephone_responsable' => 'required|integer|digits:8|starts_with:5,6,7,01,02,03,05,06,07',
+            'telephone_responsable_1' => 'required|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_responsable_2' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_responsable_3' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'nom_boutique' => 'required|string|max:255',
             'email_boutique' => 'nullable|string|email|max:255',
-            'telephone_boutique' => 'required|integer|digits:8|starts_with:5,6,7,01,02,03,05,06,07',
+            'telephone_boutique_1' => 'required|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_boutique_2' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_boutique_3' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'latitude' => 'nullable|string|max:255',
             'longitute' => 'nullable|string|max:255',
+            'heure_ouverture' => 'nullable|string|max:255',
+            'heure_fermeture' => 'nullable|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string|max:1000',
         ]);
@@ -68,12 +74,18 @@ class PartenaireController extends Controller
                 $data = Partenaire::create([
                     'nom_responsable' => $request->input('nom_responsable'),
                     'email_responsable' => $request->input('email_responsable'),
-                    'telephone_responsable' => $request->input('telephone_responsable'),
+                    'telephone_responsable_1' => $request->input('telephone_responsable_1'),
+                    'telephone_responsable_2' => $request->input('telephone_responsable_2'),
+                    'telephone_responsable_3' => $request->input('telephone_responsable_3'),
                     'nom_boutique' => $request->input('nom_boutique'),
                     'email_boutique' => $request->input('email_boutique'),
-                    'telephone_boutique' => $request->input('telephone_boutique'),
+                    'telephone_boutique_1' => $request->input('telephone_boutique_1'),
+                    'telephone_boutique_2' => $request->input('telephone_boutique_2'),
+                    'telephone_boutique_3' => $request->input('telephone_boutique_3'),
                     'latitude' => $request->input('latitude'),
                     'longitute' => $request->input('longitute'),
+                    'heure_ouverture' => $request->input('heure_ouverture'),
+                    'heure_fermeture' => $request->input('heure_fermeture'),
                     'description' => $request->input('description'),
                     'image' => 'partenaires/' . $imageName,
                     'slug' => Str::random(8),
@@ -96,7 +108,7 @@ class PartenaireController extends Controller
      */
     public function show($slug)
     {
-        $data = Partenaire::with("produits","produits.categorie")->where("slug",$slug)->first();
+        $data = Partenaire::with("produits","produits.categorie","produits.produitImages")->where("slug",$slug)->first();
 
         if (!$data) {
             return response()->json(['message' => 'Partenaire non trouvé'], 404);
@@ -122,12 +134,18 @@ class PartenaireController extends Controller
         $validator = Validator::make($request->all(), [
             'nom_responsable' => 'required|string|max:255',
             'email_responsable' => 'nullable|string|email|max:255',
-            'telephone_responsable' => 'required|integer|digits:8|starts_with:5,6,7,01,02,03,05,06,07',
+            'telephone_responsable_1' => 'required|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_responsable_2' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_responsable_3' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'nom_boutique' => 'required|string|max:255',
             'email_boutique' => 'nullable|string|email|max:255',
-            'telephone_boutique' => 'required|integer|digits:8|starts_with:5,6,7,01,02,03,05,06,07',
+            'telephone_boutique_1' => 'required|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_boutique_2' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
+            'telephone_boutique_3' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'latitude' => 'nullable|string|max:255',
             'longitute' => 'nullable|string|max:255',
+            'heure_ouverture' => 'nullable|string|max:255',
+            'heure_fermeture' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string|max:1000',
         ]);
@@ -145,12 +163,18 @@ class PartenaireController extends Controller
         $data->update([
             'nom_responsable' => $request->input('nom_responsable'),
             'email_responsable' => $request->input('email_responsable'),
-            'telephone_responsable' => $request->input('telephone_responsable'),
+            'telephone_responsable_1' => $request->input('telephone_responsable_1'),
+            'telephone_responsable_2' => $request->input('telephone_responsable_2'),
+            'telephone_responsable_3' => $request->input('telephone_responsable_3'),
             'nom_boutique' => $request->input('nom_boutique'),
             'email_boutique' => $request->input('email_boutique'),
-            'telephone_boutique' => $request->input('telephone_boutique'),
+            'telephone_boutique_1' => $request->input('telephone_boutique_1'),
+            'telephone_boutique_2' => $request->input('telephone_boutique_2'),
+            'telephone_boutique_3' => $request->input('telephone_boutique_3'),
             'latitude' => $request->input('latitude'),
             'longitute' => $request->input('longitute'),
+            'heure_ouverture' => $request->input('heure_ouverture'),
+            'heure_fermeture' => $request->input('heure_fermeture'),
             'description' => $request->input('description'),
         ]);
 

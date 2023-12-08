@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\Produit;
 use App\Models\Partenaire;
 use App\Models\Categorie;
+use App\Models\ProduitImage;
 
 
 class ProduitController extends Controller
@@ -22,7 +23,7 @@ class ProduitController extends Controller
      */
     public function index()
     {
-        $data = Produit::with("categorie","partenaire")->where("is_deleted", false)->get();
+        $data = Produit::with("categorie","partenaire","produitImages")->where("is_deleted", false)->get();
 
 
         if ($data->isEmpty()) {
@@ -48,9 +49,11 @@ class ProduitController extends Controller
             'stock' => 'required|string|max:255',
             'disponibilite' => 'nullable|string|max:255',
             'dure_livraison' => 'nullable|string|max:255',
+            'quantite_min' => 'nullable|string|max:255',
             'partenaire' => 'required|string|max:8',
             'categorie' => 'required|string|max:8',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            //'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
             'description' => 'required|string|max:1000',
         ]);
         
@@ -70,33 +73,62 @@ class ProduitController extends Controller
             return response()->json(['message' => "Categorie non trouvée"], 404);
         }
 
-        if ($request->hasFile('image')) {
-            // Générer un nom aléatoire pour l'image
-            $imageName = Str::random(10) . '.' . $request->image->getClientOriginalExtension();
+        $data = Produit::create([
+            'nom' => $request->input('nom'),
+            'prix' => $request->input('prix'),
+            'stock' => $request->input('stock'),
+            'disponibilite' => $request->input('disponibilite'),
+            'dure_livraison' => $request->input('dure_livraison'),
+            'quantite_min' => $request->input('quantite_min'),
+            'categorie_id' => $categorie->id,
+            'partenaire_id' => $partenaire->id,
+            'description' => $request->input('description'),
+            //'image' => 'produits/' . $imageName,
+            'slug' => Str::random(8),
+        ]);
+        
+        if ($request->hasFile('files')) {
+            $files = $request["files"];
+           // dd($files);
+            foreach($files as $file){
+               // dd($file);
+                // Générer un nom aléatoire pour l'image
+                $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-            // Enregistrer l'image dans le dossier public/images
-            $imagePath = $request->image->move(public_path('produits'), $imageName);
+                // Enregistrer l'image dans le dossier public/images
+                $filePath = $file->move(public_path('produits'), $fileName);
 
-            if ($imagePath) {
-                $data = Produit::create([
-                    'nom' => $request->input('nom'),
-                    'prix' => $request->input('prix'),
-                    'stock' => $request->input('stock'),
-                    'disponibilite' => $request->input('disponibilite'),
-                    'dure_livraison' => $request->input('dure_livraison'),
-                    'categorie_id' => $categorie->id,
-                    'partenaire_id' => $partenaire->id,
-                    'description' => $request->input('description'),
-                    'image' => 'produits/' . $imageName,
-                    'slug' => Str::random(8),
-                ]);
-               
-                return response()->json(['message' => 'Produit créé avec succès', 'data' => $data], 200);
+                if ($filePath) {
+                    // Créer la nouvelle catégorie de média
+                    $doc = ProduitImage::create([
+                        'name' => $fileName,
+                        'url' => 'produits/' . $fileName,
+                        'slug' => Str::random(8),
+                        'produit_id' => $data->id,
+                    ]);
+                    
+                }
             }
-            return response()->json(['error' => 'Échec lors de la création'], 422);
+            //return response()->json(['message' => 'Fichiers ajoutés avec succès'], 200);
+            
         }
 
-        return response()->json(['error' => 'Échec lors de la création'], 422);
+        if ($request->hasFile('video')) {
+
+            $videoName = Str::random(10) . '.' . $request->video->getClientOriginalExtension();
+
+            $videoPath = $request->video->move(public_path('videos'), $videoName);
+            //dd($request->video->getMimeType());
+            if ($videoPath) {
+                $data->update([
+                    
+                    'video' => 'videos/' . $videoName,
+                ]);
+
+            }
+        }
+
+        return response()->json(['message' => 'Produit créé avec succès', 'data' => $data], 200);
     }
 
 
@@ -108,7 +140,7 @@ class ProduitController extends Controller
      */
     public function show($slug)
     {
-        $data = Produit::with("categorie","partenaire")->where("slug",$slug)->first();
+        $data = Produit::with("categorie","partenaire", "produitImages")->where("slug",$slug)->first();
 
         if (!$data) {
             return response()->json(['message' => 'Produit non trouvé'], 404);
@@ -137,8 +169,10 @@ class ProduitController extends Controller
             'stock' => 'required|string|max:255',
             'disponibilite' => 'nullable|string|max:255',
             'dure_livraison' => 'nullable|string|max:255',
+            'quantite_min' => 'nullable|string|max:255',
             'categorie' => 'required|string|max:8',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            //'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
             'description' => 'required|string|max:1000',
         ]);
         
@@ -169,18 +203,45 @@ class ProduitController extends Controller
             'description' => $request->input('description'),
         ]);
 
-        if ($request->hasFile('image')) {
+        
+        if ($request->hasFile('files')) {
+            $files = $request["files"];
+           // dd($files);
+            foreach($files as $file){
+               // dd($file);
+                // Générer un nom aléatoire pour l'image
+                $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
+
+                // Enregistrer l'image dans le dossier public/images
+                $filePath = $file->move(public_path('produits'), $fileName);
+
+                if ($filePath) {
+                    // Créer la nouvelle catégorie de média
+                    $doc = ProduitImage::create([
+                        'name' => $fileName,
+                        'url' => 'produits/' . $fileName,
+                        'slug' => Str::random(8),
+                        'produit_id' => $data->id,
+                    ]);
+                    
+                }
+            }
+            return response()->json(['message' => 'Fichiers ajoutés avec succès'], 200);
+            
+        }
+        if ($request->hasFile('video')) {
             // Générer un nom aléatoire pour l'image
-            $imageName = Str::random(10) . '.' . $request->image->getClientOriginalExtension();
+            $videoName = Str::random(10) . '.' . $request->video->getClientOriginalExtension();
 
             // Enregistrer l'image dans le dossier public/images
-            $imagePath = $request->image->move(public_path('produits'), $imageName);
+            $videoPath = $request->video->move(public_path('videos'), $videoName);
 
-            if ($imagePath) {
+            if ($videoPath) {
                 //Storage::delete($data->image);
-                File::delete(public_path($data->image));
+                File::delete(public_path($data->video));
                 $data->update([
-                    'image' => 'produits/' . $imageName,
+                    'name' => $request->video->getMimeType(),
+                    'video' => 'videos/' . $videoName,
                 ]);
 
             }

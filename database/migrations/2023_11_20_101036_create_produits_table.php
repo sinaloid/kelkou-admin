@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('nom');
             $table->string('prix')->nullable();
             $table->string('stock')->nullable();
-            $table->string('image')->nullable();
+            $table->string('video')->nullable();
+            //$table->json('content')->nullable();
             $table->string('disponibilite')->nullable();
+            $table->string('quantite_min')->nullable();
             $table->string('dure_livraison')->nullable();
             $table->longText('description')->nullable();
 

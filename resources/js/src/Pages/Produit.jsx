@@ -10,14 +10,18 @@ import request, { URL } from "../services/request";
 import { Input } from "../components/Input";
 import { useFormik } from "formik";
 import { pagination } from "../services/function";
+import ReactPlayer from "react-player";
+import rect from "../assets/images/rect.png"
 
 const initData = {
     nom: "",
     prix: "",
     stock: "",
-    image: "",
+    files: "",
     disponibilite: "",
     dure_livraison: "",
+    quantite_min: "",
+    video: "",
     description: "",
     partenaire: "",
     categorie: "",
@@ -36,12 +40,12 @@ export const Produit = () => {
     const close = useRef();
     const closeDelete = useRef();
     const [detail, setDetail] = useState("");
-    const [viewData, setViewData] = useState({});
-    const [partenaires, setPartenaires] = useState([])
+    const [viewData, setViewData] = useState({produit_images:[]});
+    const [partenaires, setPartenaires] = useState([]);
     useEffect(() => {
         get();
         getCategorie();
-        getPartenaire()
+        getPartenaire();
     }, []);
     const formik = useFormik({
         initialValues: initData,
@@ -50,7 +54,6 @@ export const Produit = () => {
             if (values.slug) {
                 update(values);
             } else {
-                
                 post(values);
             }
         },
@@ -91,16 +94,16 @@ export const Produit = () => {
             });
     };
     const getPartenaire = () => {
-      request
-          .get(endPoint.partenaires)
-          .then((res) => {
-              console.log(res.data.data);
-              setPartenaires(res.data.data);
-          })
-          .catch((error) => {
-              console.log(error);
-          });
-  };
+        request
+            .get(endPoint.partenaires)
+            .then((res) => {
+                console.log(res.data.data);
+                setPartenaires(res.data.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
     const post = (values) => {
         request
             .post(endPoint.produits, values)
@@ -169,6 +172,7 @@ export const Produit = () => {
         formik.setFieldValue("stock", data.stock);
         formik.setFieldValue("disponibilite", data.disponibilite);
         formik.setFieldValue("dure_livraison", data.dure_livraison);
+        formik.setFieldValue("quantite_min", data.quantite_min);
         formik.setFieldValue("categorie", data.categorie.slug);
         formik.setFieldValue("description", data.description);
     };
@@ -215,7 +219,7 @@ export const Produit = () => {
                                 className="btn btn-primary"
                                 data-bs-toggle="modal"
                                 data-bs-target="#produit"
-                                onClick={e => formik.resetForm()}
+                                onClick={(e) => formik.resetForm()}
                             >
                                 Ajouter
                             </button>
@@ -225,13 +229,16 @@ export const Produit = () => {
             </div>
             <div className="row row-cols-12 row-cols-md-4 g-4">
                 {datas.small.map((data, idx) => {
+                    const img =
+                    data.produit_images.length !== 0 ?
+                    URL + data.produit_images[0].url : rect;
                     return (
                         <div className="col mb-3" key={idx}>
                             <div className="card">
                                 <div className="position-relative">
                                     <img
                                         width={"100%"}
-                                        src={URL + data.image}
+                                        src={ img}
                                     />
                                     <span
                                         className="position-absolute bg-primary px-1 fw-bold"
@@ -331,6 +338,12 @@ export const Produit = () => {
                             />
                             <Input
                                 type={"text"}
+                                placeholder="Quantité en minimum du produit"
+                                name={"quantite_min"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
                                 placeholder="Dure de livraison du produit"
                                 name={"dure_livraison"}
                                 formik={formik}
@@ -363,9 +376,17 @@ export const Produit = () => {
                                 options={categories}
                             />
                             <Input
+                                type={"files"}
+                                label="Images du produit"
+                                placeholder="Images du produit"
+                                name={"files"}
+                                formik={formik}
+                            />
+                            <Input
                                 type={"file"}
-                                placeholder="Image du produit"
-                                name={"image"}
+                                label="Courte video du produit"
+                                placeholder="Courte video du produit"
+                                name={"video"}
                                 formik={formik}
                             />
                             <Input
@@ -459,13 +480,21 @@ export const Produit = () => {
                             ></button>
                         </div>
                         <div className="modal-body text-start">
-                            <div className="d-flex">
-                                <img
-                                    width={"180px"}
-                                    height={"180px"}
-                                    src={URL + viewData.image}
-                                    alt=""
-                                />
+                            <div className="d-flex1">
+                            <div className="d-flex flex-wrap mb-3">
+                                    {viewData.produit_images.map((data) => {
+                                        return (
+                                            <span className="me-2">
+                                                <img
+                                                    width={"180px"}
+                                                    height={"180px"}
+                                                    src={URL + data.url}
+                                                    alt=""
+                                                />
+                                            </span>
+                                        );
+                                    })}
+                                </div>
                                 <div className="ps-3 w-100">
                                     <div className="d-flex align-items-center">
                                         <div>
@@ -517,6 +546,15 @@ export const Produit = () => {
                                             Description :{" "}
                                         </span>
                                         <p>{viewData.description}</p>
+                                    </div>
+                                    <div>
+                                        {viewData.video && (
+                                            <ReactPlayer
+                                                url={URL + viewData.video}
+                                                controls={true}
+                                                width={"100%"}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             </div>

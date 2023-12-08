@@ -21,6 +21,8 @@ const initData = {
     isActive: "",
     role: "",
     number: "",
+    number_1: "",
+    number_2: "",
     genre: "",
     email: "",
     password: "",
@@ -359,14 +361,26 @@ export const Personnel = () => {
                             />
                             <Input
                                 type={"email"}
-                                placeholder="Emali "
+                                placeholder="Email "
                                 name={"email"}
                                 formik={formik}
                             />
                             <Input
                                 type={"text"}
-                                placeholder="Numéro de téléphone"
+                                placeholder="Numéro de téléphone 1"
                                 name={"number"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Numéro de téléphone 2"
+                                name={"number_1"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"text"}
+                                placeholder="Numéro de téléphone 3"
+                                name={"number_2"}
                                 formik={formik}
                             />
 
@@ -376,9 +390,9 @@ export const Personnel = () => {
                                 name={"genre"}
                                 formik={formik}
                                 options={[
-                                    { slug: "homme", nom: "Homme" },
+                                    { slug: "Homme", nom: "Homme" },
                                     {
-                                        slug: "femme",
+                                        slug: "Femme",
                                         nom: "Femme",
                                     },
                                 ]}

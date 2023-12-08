@@ -209,6 +209,26 @@ export const Input = ({
             </div>
         );
     }
+    if (type === "files") {
+        return (
+            <div className="mb-3">
+                <label htmlFor={name} className="form-label">
+                    {label}
+                </label>
+                <input
+                    className="form-control"
+                    type="file"
+                    id={name}
+                    name={name}
+                    placeholder={placeholder}
+                    onChange={(e) => {
+                        formik.setFieldValue(name, e.target.files);
+                    }}
+                    multiple
+                />
+            </div>
+        );
+    }
     if (type === "date") {
         return (
             <div className="mb-3">
@@ -222,6 +242,26 @@ export const Input = ({
                     type="date"
                     id={name}
                     name={name}
+                    onChange={formik.handleChange}
+                    value={formik.values[name]}
+                />
+            </div>
+        );
+    }
+    if (type === "time") {
+        return (
+            <div className="mb-3">
+                {label && (
+                    <label htmlFor={name} className="form-label">
+                        {label}
+                    </label>
+                )}
+                <input
+                    className="form-control"
+                    type="time"
+                    id={name}
+                    name={name}
+                    placeholder={placeholder}
                     onChange={formik.handleChange}
                     value={formik.values[name]}
                 />

@@ -27,6 +27,8 @@ class User extends Authenticatable
         "isActive",
         "role",
         "number",
+        "number_1",
+        "number_2",
         "genre",
         "engin_immatriculation",
         "email",

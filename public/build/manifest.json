@@ -14,13 +14,14 @@
   "resources/js/app.js": {
     "assets": [
       "assets/kelkou-14a3f0e1.png",
+      "assets/rect-9e3e5467.png",
       "assets/bootstrap-icons-bacd70af.woff2",
       "assets/bootstrap-icons-4d4572ef.woff"
     ],
     "css": [
       "assets/app-7d86b53a.css"
     ],
-    "file": "assets/app-7dd087fb.js",
+    "file": "assets/app-fea86889.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
@@ -35,6 +36,10 @@
   "resources/js/src/assets/images/profile.png": {
     "file": "assets/profile-2ab88d08.png",
     "src": "resources/js/src/assets/images/profile.png"
+  },
+  "resources/js/src/assets/images/rect.png": {
+    "file": "assets/rect-9e3e5467.png",
+    "src": "resources/js/src/assets/images/rect.png"
   },
   "resources/js/src/logo.svg": {
     "file": "assets/logo-6000b0e9.svg",

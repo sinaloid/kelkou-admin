@@ -12,8 +12,9 @@ class Produit extends Model
         "nom",
         "prix",
         "stock",
-        "image",
+        "video",
         "disponibilite",
+        "quantite_min",
         "dure_livraison",
         "description",
         "slug",
@@ -30,5 +31,10 @@ class Produit extends Model
     public function categorie(){
 
         return $this->belongsTo(Categorie::class);
+    }
+
+    public function produitImages(){
+
+        return $this->hasMany(ProduitImage::class);
     }
 }

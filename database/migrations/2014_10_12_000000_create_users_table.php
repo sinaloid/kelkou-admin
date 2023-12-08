@@ -21,11 +21,14 @@ return new class extends Migration
             $table->string('type');
             $table->string('genre');
             $table->string('isActive')->nullable();
+            $table->string('isPartenaire')->nullable();
             $table->string('slug')->nullable();
             $table->string('role')->nullable();
             $table->string('engin_immatriculation')->nullable();
             $table->string('image')->nullable();
             $table->string('number')->unique()->nullable();
+            $table->string('number_1')->nullable();
+            $table->string('number_2')->nullable();
             $table->string('email')->unique()->nullable();
             $table->boolean('email_verified')->nullable();
             $table->boolean('number_verified')->nullable();

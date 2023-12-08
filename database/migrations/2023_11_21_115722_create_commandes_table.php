@@ -20,6 +20,9 @@ return new class extends Migration
 
             $table->string('statut_commande')->nullable();
             $table->string('statut_paiement')->nullable();
+            $table->string('prix_livraison')->nullable();
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
 
             $table->string('slug');
             $table->boolean("is_deleted")->default(false);
