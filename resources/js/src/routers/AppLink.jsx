@@ -11,6 +11,8 @@ const AppLink = {
     categories:"categories",
     paiements:"paiements",
     personnel:"le-personnel",
+    publicites:"publicites",
+    reclamations:"reclamations",
     livreurs:"livreurs",
     clients:"clients",
     notifications:"notifications",

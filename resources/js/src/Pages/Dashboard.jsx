@@ -261,6 +261,34 @@ const Dashboard = () => {
                                             Personnels
                                         </NavLink>
                                     </li>
+                                    <li class="nav-item">
+                                        <NavLink
+                                            className={({ isActive }) =>
+                                                `nav-link d-flex align-items-center gap-2 ${
+                                                    isActive &&
+                                                    "active text-white"
+                                                }`
+                                            }
+                                            to={AppLink.publicites}
+                                        >
+                                            <i class="bi bi-file-earmark"></i>
+                                            Publicités
+                                        </NavLink>
+                                    </li>
+                                    <li class="nav-item">
+                                        <NavLink
+                                            className={({ isActive }) =>
+                                                `nav-link d-flex align-items-center gap-2 ${
+                                                    isActive &&
+                                                    "active text-white"
+                                                }`
+                                            }
+                                            to={AppLink.reclamations}
+                                        >
+                                            <i class="bi bi-file-earmark"></i>
+                                            Réclamations
+                                        </NavLink>
+                                    </li>
                                 </ul>
                                 <div className="mb-2"></div>
 

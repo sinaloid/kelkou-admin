@@ -13,42 +13,29 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('produits', function (Blueprint $table) {
+        Schema::create('produit_variantes', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
             $table->string('prix')->nullable();
             $table->string('stock')->nullable();
             $table->string('video')->nullable();
-            //$table->json('content')->nullable();
+            $table->json('variante')->nullable();
             $table->string('disponibilite')->nullable();
             $table->string('quantite_min')->nullable();
             $table->string('dure_livraison')->nullable();
             $table->longText('description')->nullable();
-            
-            $table->boolean("is_promotion")->default(false);
-            $table->string("etat_promotion")->default("Pas de promotion");
-            $table->string('debut_promotion')->nullable();
-            $table->string('fin_promotion')->nullable();
             $table->string('prix_promotion')->nullable();
-
-
-
+            
             $table->string('slug');
             $table->boolean("is_deleted")->default(false);
 
-            $table->unsignedBigInteger('partenaire_id')->nullable();
-            $table->foreign('partenaire_id')
+            $table->unsignedBigInteger('produit_id')->nullable();
+            $table->foreign('produit_id')
                     ->references('id')
-                    ->on('partenaires')
+                    ->on('produits')
                     ->onDelete('cascade')
                     ->onUpdate('cascade');
 
-            $table->unsignedBigInteger('categorie_id')->nullable();
-            $table->foreign('categorie_id')
-                    ->references('id')
-                    ->on('categories')
-                    ->onDelete('cascade')
-                    ->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -60,6 +47,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('produits');
+        Schema::dropIfExists('produit_variantes');
     }
 };

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('telephone_boutique_1')->nullable();
             $table->string('telephone_boutique_2')->nullable();
             $table->string('telephone_boutique_3')->nullable();
-            
+
             $table->string('heure_ouverture')->nullable();
             $table->string('heure_fermeture')->nullable();
 
@@ -35,6 +35,13 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->longText('description')->nullable();
             $table->boolean("is_deleted")->default(false);
+
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')
+                    ->references('id')
+                    ->on('users')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
             
             $table->timestamps();
         });

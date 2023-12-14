@@ -14,5 +14,6 @@ class ProduitImage extends Model
         "slug",
         "is_deleted",
         "produit_id",
+        "produit_variante_id"
     ];
 }

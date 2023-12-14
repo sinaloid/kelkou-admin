@@ -20,10 +20,17 @@ return new class extends Migration
             $table->string("slug");
             $table->boolean("is_deleted")->default(false);
 
-            $table->unsignedBigInteger('produit_id');
+            $table->unsignedBigInteger('produit_id')->nullable();
             $table->foreign('produit_id')
                     ->references('id')
                     ->on('produits')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
+
+            $table->unsignedBigInteger('produit_variante_id')->nullable();
+            $table->foreign('produit_variante_id')
+                    ->references('id')
+                    ->on('produit_variantes')
                     ->onDelete('cascade')
                     ->onUpdate('cascade');
             $table->timestamps();

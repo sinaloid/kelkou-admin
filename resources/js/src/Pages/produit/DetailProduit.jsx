@@ -10,7 +10,7 @@ import request, { URL } from "../../services/request";
 import { Input } from "../../components/Input";
 import { useFormik } from "formik";
 import { pagination } from "../../services/function";
-import { useParams } from "react-router-dom";
+import { json, useParams } from "react-router-dom";
 import { Video } from "../../components/Video";
 import ReactPlayer from "react-player";
 import rect from "../../assets/images/rect.png";
@@ -26,7 +26,7 @@ const initData = {
     partenaire: "",
     categorie: "",
 };
-export const DetailPartenaire = () => {
+export const DetailProduit = () => {
     const [datas, setDatas] = useState({
         all: [],
         small: [],
@@ -51,10 +51,13 @@ export const DetailPartenaire = () => {
         initialValues: initData,
         onSubmit: (values) => {
             console.log(values);
+            values.variante = JSON.stringify("variante");
+
             if (values.slug) {
                 update(values);
             } else {
-                values.partenaire = detail.slug;
+                values.produit = detail.slug;
+
                 post(values);
             }
         },
@@ -62,17 +65,17 @@ export const DetailPartenaire = () => {
 
     const get = () => {
         request
-            .get(endPoint.partenaires + "/" + slug)
+            .get(endPoint.produits + "/" + slug)
             .then((res) => {
                 console.log(res.data.data);
                 setDetail(res.data.data);
-                const tab = pagination(res.data.data.produits, 10);
+                const tab = pagination(res.data.data.produit_variantes, 10);
 
                 //console.log(tab);
 
                 if (tab.counter !== 0) {
                     setDatas({
-                        all: res.data.data.produits,
+                        all: res.data.data.produit_variantes,
                         small: tab.list[0],
                     });
                     setPages(tab);
@@ -95,8 +98,9 @@ export const DetailPartenaire = () => {
             });
     };
     const post = (values) => {
+        console.log(values);
         request
-            .post(endPoint.produits, values)
+            .post(endPoint.produitVariantes, values)
             .then((res) => {
                 console.log(res.data);
                 close.current.click();
@@ -110,7 +114,7 @@ export const DetailPartenaire = () => {
     const update = (values) => {
         console.log(values);
         request
-            .post(endPoint.produits + "/" + values.slug, values)
+            .post(endPoint.produitVariantes + "/" + values.slug, values)
             .then((res) => {
                 console.log(res.data);
                 close.current.click();
@@ -123,7 +127,7 @@ export const DetailPartenaire = () => {
 
     const destroy = () => {
         request
-            .delete(endPoint.produits + "/" + viewData.slug)
+            .delete(endPoint.produitVariantes + "/" + viewData.slug)
             .then((res) => {
                 console.log(res.data);
                 closeDelete.current.click();
@@ -163,15 +167,15 @@ export const DetailPartenaire = () => {
         formik.setFieldValue("prix", data.prix);
         formik.setFieldValue("stock", data.stock);
         formik.setFieldValue("disponibilite", data.disponibilite);
+        formik.setFieldValue("quantite_min", data.quantite_min);
         formik.setFieldValue("dure_livraison", data.dure_livraison);
-        formik.setFieldValue("categorie", data.categorie.slug);
         formik.setFieldValue("description", data.description);
     };
     return (
         <>
             <div className="row mb-5">
                 <div className="col-12">
-                    <div className="d-flex align-items-center">
+                    <div className="d-flex align-items-center1">
                         <img
                             className="me-3"
                             width={"160px"}
@@ -181,89 +185,133 @@ export const DetailPartenaire = () => {
                         <div className="me-3 text-start">
                             <div className="bg-gray">
                                 <span className="fw-bold">
-                                    Informations de la boutique
+                                    Informations sur le produit
                                 </span>
                             </div>
                             <div className="me-4">
                                 <span className="fw-bold fs-40">
-                                    {detail.nom_boutique}
+                                    {detail.nom}
                                 </span>
                                 <br />
-                                <span>Email boutique : </span>
+                                <span>Categorie : </span>
                                 <span className="fw-bold">
-                                    {detail.email_boutique}
+                                    {detail.categorie?.nom}
                                 </span>{" "}
                                 <br />
-                                <span>Téléphone boutique : </span>
-                                <div className="fw-bold">
-                                    <span>{detail.telephone_boutique_1}</span>{" "}
-                                    <br />
-                                    <span>
-                                        {detail.telephone_boutique_2}
-                                    </span>{" "}
-                                    <br />
-                                    <span>
-                                        {detail.telephone_boutique_3}
-                                    </span>{" "}
-                                    <br />
-                                </div>{" "}
+                                <span>Prix : </span>
+                                <span className="fw-bold">
+                                    {detail.prix + " Xof"}
+                                </span>{" "}
+                                <br />
+                                <span>Stock : </span>
+                                <span className="fw-bold">
+                                    {detail.stock}
+                                </span>{" "}
+                                <br />
+                                <span>Quantité min : </span>
+                                <span className="fw-bold">
+                                    {detail.quantite_min}
+                                </span>{" "}
+                                <br />
+                                <span>En promotion : </span>
+                                <span className="fw-bold">
+                                    {detail.is_promotion ? "Oui" : "Non"}
+                                </span>{" "}
+                                <br />
+                                <span>Etat promotion : </span>
+                                <span className="fw-bold">
+                                    {detail.etat_promotion}
+                                </span>{" "}
+                                <br />
                             </div>
                         </div>
                         <div className="me-3 text-start">
                             <div className="bg-gray">
                                 <span className="fw-bold">
-                                    Informations du responsable
+                                    Informations de la boutique
                                 </span>
                             </div>
                             <div className="text-start">
                                 <span className="fw-bold fs-40">
-                                    {detail.nom_responsable}
+                                    {detail.partenaire?.nom_boutique}
                                 </span>{" "}
                                 <br />
-                                <span>Email responsable: </span>
+                                <span>Email boutique: </span>
                                 <span className="fw-bold">
-                                    {detail.email_responsable}
+                                    {detail.partenaire?.email_boutique}
                                 </span>{" "}
                                 <br />
-                                <div className="">Téléphone responsable: </div>
+                                <div className="">Téléphone boutique: </div>
                                 <div className="d-inline-block fw-bold">
                                     <span>
-                                        {detail.telephone_responsable_1}
+                                        {
+                                            detail.partenaire
+                                                ?.telephone_boutique_1
+                                        }
                                     </span>{" "}
                                     <br />
                                     <span>
-                                        {detail.telephone_responsable_2}
+                                        {
+                                            detail.partenaire
+                                                ?.telephone_boutique_2
+                                        }
                                     </span>{" "}
                                     <br />
                                     <span>
-                                        {detail.telephone_responsable_3}
+                                        {
+                                            detail.partenaire
+                                                ?.telephone_boutique_3
+                                        }
                                     </span>{" "}
                                     <br />
                                 </div>{" "}
+                                <br />
+                                <div className="d-inline-block me-2">
+                                    <span>Heure d'ouverture : </span>{" "}
+                                    <span className="fw-bold">
+                                        {detail.partenaire?.heure_ouverture}
+                                    </span>
+                                </div>
+                                <br />
+                                <div className="d-inline-block me-2">
+                                    <span>Heure femeture : </span>{" "}
+                                    <span className="fw-bold">
+                                        {detail.partenaire?.heure_fermeture}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="col-12 text-start">
-                    <div className="text-muted">
+                    <div className="text-muted mb-3">
                         Créer le :{" "}
                         {new Date(detail.created_at).toLocaleDateString()}
                     </div>
-                    <div>
-                        <div className="d-inline-block me-2">
-                            <span>Heure d'ouverture : </span>{" "}
-                            <span className="fw-bold">
-                                {detail.heure_ouverture}
-                            </span>
-                        </div>
-                        <div className="d-inline-block me-2">
-                            <span>Heure femeture : </span>{" "}
-                            <span className="fw-bold">
-                                {detail.heure_fermeture}
-                            </span>
-                        </div>
+                    <div className="d-flex flex-wrap mb-3">
+                        {detail.produit_images?.map((data) => {
+                            return (
+                                <span className="me-2">
+                                    <img
+                                        width={"180px"}
+                                        height={"180px"}
+                                        src={URL + data.url}
+                                        alt=""
+                                    />
+                                </span>
+                            );
+                        })}
                     </div>
                     <p className="text-start">{detail.description}</p>
+                    <div>
+                        {detail.video && (
+                            <ReactPlayer
+                                url={URL + detail.video}
+                                controls={true}
+                                width={"100%"}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -479,13 +527,7 @@ export const DetailPartenaire = () => {
                                     },
                                 ]}
                             />
-                            <Input
-                                type={"select2"}
-                                placeholder="Catégorie du produit"
-                                name={"categorie"}
-                                formik={formik}
-                                options={categories}
-                            />
+                            
                             <Input
                                 type={"files"}
                                 label="Images du produit"
@@ -606,7 +648,6 @@ export const DetailPartenaire = () => {
                                         );
                                     })}
                                 </div>
-
                                 <div className="ps-3 w-100">
                                     <div className="d-flex align-items-center">
                                         <div>
@@ -641,13 +682,6 @@ export const DetailPartenaire = () => {
                                         </span>
                                     </div>
                                     <div>
-                                        <span>Quantité min : </span>
-                                        <span className="fw-bold">
-                                            {viewData.quantite_min +
-                                                " produit(s)"}
-                                        </span>
-                                    </div>
-                                    <div>
                                         <span>Disponiblilité : </span>
                                         <span className="fw-bold">
                                             {viewData.disponibilite}
@@ -666,16 +700,15 @@ export const DetailPartenaire = () => {
                                         </span>
                                         <p>{viewData.description}</p>
                                     </div>
-                                </div>
-
-                                <div>
-                                    {viewData.video && (
-                                        <ReactPlayer
-                                            url={URL + viewData.video}
-                                            controls={true}
-                                            width={"100%"}
-                                        />
-                                    )}
+                                    <div>
+                                        {viewData.video && (
+                                            <ReactPlayer
+                                                url={URL + viewData.video}
+                                                controls={true}
+                                                width={"100%"}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

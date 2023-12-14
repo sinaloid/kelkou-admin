@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use App\Models\Produit;
-use App\Models\Partenaire;
-use App\Models\Categorie;
+use App\Models\ProduitVariante;
 use App\Models\ProduitImage;
 
 
-class ProduitController extends Controller
+
+class ProduitVarianteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,7 +23,7 @@ class ProduitController extends Controller
      */
     public function index()
     {
-        $data = Produit::with("categorie","partenaire","produitImages")->where("is_deleted", false)->get();
+        $data = ProduitVariante::with("produitImages")->where("is_deleted", false)->get();
 
 
         if ($data->isEmpty()) {
@@ -50,38 +50,32 @@ class ProduitController extends Controller
             'disponibilite' => 'nullable|string|max:255',
             'dure_livraison' => 'nullable|string|max:255',
             'quantite_min' => 'nullable|string|max:255',
-            'partenaire' => 'required|string|max:8',
-            'categorie' => 'required|string|max:8',
-            //'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'produit' => 'required|string|max:8',
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
             'description' => 'required|string|max:1000',
+            'variante' => 'required|string|max:1000',
+
         ]);
         
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
 
-        $partenaire = Partenaire::where("slug", $request->partenaire)->where("is_deleted",false)->first();
+        $produit = Produit::where("slug", $request->produit)->where("is_deleted",false)->first();
 
-        if(!$partenaire){
-            return response()->json(['message' => "Partenaire non trouvé"], 422);
+        if(!$produit){
+            return response()->json(['message' => "Produit non trouvé"], 422);
         }
 
-        $categorie = Categorie::where("slug", $request->categorie)->where("is_deleted",false)->first();
-
-        if(!$categorie){
-            return response()->json(['message' => "Categorie non trouvée"], 404);
-        }
-
-        $data = Produit::create([
+        $data = ProduitVariante::create([
             'nom' => $request->input('nom'),
             'prix' => $request->input('prix'),
             'stock' => $request->input('stock'),
             'disponibilite' => $request->input('disponibilite'),
             'dure_livraison' => $request->input('dure_livraison'),
             'quantite_min' => $request->input('quantite_min'),
-            'categorie_id' => $categorie->id,
-            'partenaire_id' => $partenaire->id,
+            'produit_id' => $produit->id,
+            'variante' => $request->input('variante'),
             'description' => $request->input('description'),
             //'image' => 'produits/' . $imageName,
             'slug' => Str::random(8),
@@ -104,7 +98,7 @@ class ProduitController extends Controller
                         'name' => $fileName,
                         'url' => 'produits/' . $fileName,
                         'slug' => Str::random(8),
-                        'produit_id' => $data->id,
+                        'produit_variante_id' => $data->id,
                     ]);
                     
                 }
@@ -140,7 +134,7 @@ class ProduitController extends Controller
      */
     public function show($slug)
     {
-        $data = Produit::with("categorie","partenaire","produitVariantes","produitVariantes.produitImages", "produitImages")->where("slug",$slug)->first();
+        $data = ProduitVariante::with("produitImages")->where("slug",$slug)->first();
 
         if (!$data) {
             return response()->json(['message' => 'Produit non trouvé'], 404);
@@ -170,9 +164,9 @@ class ProduitController extends Controller
             'disponibilite' => 'nullable|string|max:255',
             'dure_livraison' => 'nullable|string|max:255',
             'quantite_min' => 'nullable|string|max:255',
-            'categorie' => 'required|string|max:8',
             //'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
+            'variante' => 'required|string|max:1000',
             'description' => 'required|string|max:1000',
         ]);
         
@@ -180,14 +174,8 @@ class ProduitController extends Controller
             return response(['errors' => $validator->errors()->all()], 422);
         }
 
-        
-        $categorie = Categorie::where("slug", $request->categorie)->where("is_deleted",false)->first();
 
-        if(!$categorie){
-            return response()->json(['message' => "Categorie non trouvée"], 404);
-        }
-
-        $data = Produit::where("slug", $slug)->where("is_deleted",false)->first();
+        $data = ProduitVariante::where("slug", $slug)->where("is_deleted",false)->first();
 
         if (!$data) {
             return response()->json(['message' => 'Produit non trouvé'], 404);
@@ -199,7 +187,7 @@ class ProduitController extends Controller
             'stock' => $request->input('stock'),
             'disponibilite' => $request->input('disponibilite'),
             'dure_livraison' => $request->input('dure_livraison'),
-            'categorie_id' => $categorie->id,
+            'variante' => $request->input('variante'),
             'description' => $request->input('description'),
         ]);
 
@@ -221,7 +209,7 @@ class ProduitController extends Controller
                         'name' => $fileName,
                         'url' => 'produits/' . $fileName,
                         'slug' => Str::random(8),
-                        'produit_id' => $data->id,
+                        'produit_variante_id' => $data->id,
                     ]);
                     
                 }
@@ -240,7 +228,6 @@ class ProduitController extends Controller
                 //Storage::delete($data->image);
                 File::delete(public_path($data->video));
                 $data->update([
-                    'name' => $request->video->getMimeType(),
                     'video' => 'videos/' . $videoName,
                 ]);
 
@@ -260,7 +247,7 @@ class ProduitController extends Controller
     public function destroy($slug)
     {
         // Trouver la catégorie de maison à supprimer
-        $data = Produit::where("slug",$slug)->where("is_deleted",false)->first();
+        $data = ProduitVariante::where("slug",$slug)->where("is_deleted",false)->first();
         if (!$data) {
             return response()->json(['message' => 'Produit non trouvé'], 404);
         }

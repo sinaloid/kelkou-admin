@@ -21,6 +21,10 @@ import { ListPartenaire } from "../Pages/partenaire/ListPartenaire";
 import { DetailPartenaire } from "../Pages/partenaire/DetailPartenaire";
 import { ListCommande } from "../Pages/commande/ListCommande";
 import { DetailCommande } from "../Pages/commande/DetailCommande";
+import { ListProduit } from "../Pages/produit/ListProduit";
+import { DetailProduit } from "../Pages/produit/DetailProduit";
+import { Publicite } from "../Pages/Publicite";
+import { Reclamation } from "../Pages/Reclamation";
 
 
 const AppRoute = ({ type }) => {
@@ -34,6 +38,14 @@ const AppRoute = ({ type }) => {
     );
   }
 
+  if (type === "produit") {
+    return (
+      <Routes>
+        <Route path={AppLink.index} element={<ListProduit />} />
+        <Route path={AppLink.detail} element={<DetailProduit />} />
+      </Routes>
+    );
+  }
   if (type === "partenaire") {
     return (
       <Routes>
@@ -57,11 +69,13 @@ const AppRoute = ({ type }) => {
       <Routes>
         <Route path={AppLink.accueil} element={<Accueil />} />
         <Route path={AppLink.commandes+"/*"} element={<Commande />} />
-        <Route path={AppLink.produits} element={<Produit />} />
+        <Route path={AppLink.produits+"/*"} element={<Produit />} />
         <Route path={AppLink.categories+"/*"} element={<Categorie />} />
         <Route path={AppLink.partenaires+"/*"} element={<Partenaire />} />
         <Route path={AppLink.paiements} element={<Paiement />} />
         <Route path={AppLink.personnel} element={<Personnel />} />
+        <Route path={AppLink.publicites} element={<Publicite />} />
+        <Route path={AppLink.reclamations} element={<Reclamation />} />
         <Route path={AppLink.livreurs} element={<Livreur />} />
         <Route path={AppLink.clients} element={<Client />} />
         <Route path={AppLink.notifications} element={<Notification />} />
