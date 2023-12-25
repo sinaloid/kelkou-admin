@@ -53,7 +53,7 @@ class ProduitVarianteController extends Controller
             'produit' => 'required|string|max:8',
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
             'description' => 'required|string|max:1000',
-            'variante' => 'required|string|max:1000',
+            'variante' => 'nullable|string|max:1000',
 
         ]);
         
@@ -166,7 +166,7 @@ class ProduitVarianteController extends Controller
             'quantite_min' => 'nullable|string|max:255',
             //'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
-            'variante' => 'required|string|max:1000',
+            'variante' => 'nullable|string|max:1000',
             'description' => 'required|string|max:1000',
         ]);
         

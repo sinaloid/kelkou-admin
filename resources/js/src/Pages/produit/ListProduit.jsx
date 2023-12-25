@@ -26,6 +26,8 @@ const initData = {
     description: "",
     partenaire: "",
     categorie: "",
+    taille: "",
+    couleur: "",
 };
 export const ListProduit = () => {
     const [datas, setDatas] = useState({
@@ -52,14 +54,27 @@ export const ListProduit = () => {
     const formik = useFormik({
         initialValues: initData,
         onSubmit: (values) => {
-            console.log(values);
+            const newValues = variante(values);
+            console.log(newValues);
+
             if (values.slug) {
-                update(values);
+                update(newValues);
             } else {
-                post(values);
+                post(newValues);
             }
         },
     });
+
+    const variante = (values) => {
+        const variante = {
+            taille: values.taille,
+            couleur: values.couleur,
+        };
+
+        values.variante = JSON.stringify(variante);
+
+        return values;
+    };
 
     const get = () => {
         request
@@ -88,7 +103,7 @@ export const ListProduit = () => {
         request
             .get(endPoint.categories)
             .then((res) => {
-                console.log(res.data.data);
+                //console.log(res.data.data);
                 setCategories(res.data.data);
             })
             .catch((error) => {
@@ -99,7 +114,7 @@ export const ListProduit = () => {
         request
             .get(endPoint.partenaires)
             .then((res) => {
-                console.log(res.data.data);
+               // console.log(res.data.data);
                 setPartenaires(res.data.data);
             })
             .catch((error) => {
@@ -177,6 +192,10 @@ export const ListProduit = () => {
         formik.setFieldValue("quantite_min", data.quantite_min);
         formik.setFieldValue("categorie", data.categorie.slug);
         formik.setFieldValue("description", data.description);
+        data.variante = JSON.parse(data.variante)
+
+        formik.setFieldValue("taille", data.variante.taille);
+        formik.setFieldValue("couleur", data.variante.couleur);
     };
     const goToDetail = (e, slug) => {
         e.preventDefault();
@@ -292,13 +311,6 @@ export const ListProduit = () => {
                                                     <EyeIcon /> Voir
                                                 </button>
                                                 <button
-                                                    className="btn btn-primary-light mx-1 rounded-3"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#promotion"
-                                                >
-                                                    <EyeIcon /> Promotion
-                                                </button>
-                                                <button
                                                     className="btn btn-warning mx-1 rounded-3"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#produit"
@@ -352,92 +364,126 @@ export const ListProduit = () => {
                             ></button>
                         </div>
                         <div className="modal-body text-start">
-                            <Input
-                                type={"text"}
-                                label="Nom du produit"
-                                placeholder="Nom du produit"
-                                name={"nom"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                label="Prix du produit"
-                                placeholder="Prix du produit"
-                                name={"prix"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                label="Quantité en stock"
-                                placeholder="Quantité en stock"
-                                name={"stock"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                label="Quantité en minimum du produit"
-                                placeholder="Quantité en minimum du produit"
-                                name={"quantite_min"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                label="Dure de livraison du produit"
-                                placeholder="Dure de livraison du produit"
-                                name={"dure_livraison"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"select"}
-                                label="Disponibilié du produit"
-                                placeholder="Disponibilié du produit"
-                                name={"disponibilite"}
-                                formik={formik}
-                                options={[
-                                    { slug: "immediate", nom: "Immediate" },
-                                    {
-                                        slug: "sur commande",
-                                        nom: "Sur commande",
-                                    },
-                                ]}
-                            />
-                            <Input
-                                type={"select-partenaire"}
-                                label="Propriétaire du produit"
-                                placeholder="Propriétaire du produit"
-                                name={"partenaire"}
-                                formik={formik}
-                                options={partenaires}
-                            />
-                            <Input
-                                type={"select2"}
-                                label="Catégorie du produit"
-                                placeholder="Catégorie du produit"
-                                name={"categorie"}
-                                formik={formik}
-                                options={categories}
-                            />
-                            <Input
-                                type={"files"}
-                                label="Images du produit"
-                                placeholder="Images du produit"
-                                name={"files"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"file"}
-                                label="Courte video du produit"
-                                placeholder="Courte video du produit"
-                                name={"video"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"textarea"}
-                                label="Description du produit"
-                                placeholder="Description du produit"
-                                name={"description"}
-                                formik={formik}
-                            />
+                            <div className="row">
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"text"}
+                                        label="Nom du produit"
+                                        placeholder="Nom du produit"
+                                        name={"nom"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Prix du produit"
+                                        placeholder="Prix du produit"
+                                        name={"prix"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Quantité en stock"
+                                        placeholder="Quantité en stock"
+                                        name={"stock"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Quantité en minimum du produit"
+                                        placeholder="Quantité en minimum du produit"
+                                        name={"quantite_min"}
+                                        formik={formik}
+                                    />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"files"}
+                                        label="Images du produit"
+                                        placeholder="Images du produit"
+                                        name={"files"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"file"}
+                                        label="Courte video du produit"
+                                        placeholder="Courte video du produit"
+                                        name={"video"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"textarea"}
+                                        label="Description du produit"
+                                        placeholder="Description du produit"
+                                        name={"description"}
+                                        formik={formik}
+                                    />
+                                </div>
+                            </div>
+                            <div className="row border-top pt-3">
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"select"}
+                                        label="Disponibilié du produit"
+                                        placeholder="Disponibilié du produit"
+                                        name={"disponibilite"}
+                                        formik={formik}
+                                        options={[
+                                            {
+                                                slug: "immediate",
+                                                nom: "Immediate",
+                                            },
+                                            {
+                                                slug: "sur commande",
+                                                nom: "Sur commande",
+                                            },
+                                        ]}
+                                    />
+                                    {formik.values["disponibilite"] === "sur commande" && (
+                                        <>
+                                            <Input
+                                                type={"text"}
+                                                label="Dure de livraison du produit"
+                                                placeholder="Dure de livraison du produit"
+                                                name={"dure_livraison"}
+                                                formik={formik}
+                                            />
+                                        </>
+                                    )}
+
+                                    <Input
+                                        type={"select-partenaire"}
+                                        label="Propriétaire du produit"
+                                        placeholder="Propriétaire du produit"
+                                        name={"partenaire"}
+                                        formik={formik}
+                                        options={partenaires}
+                                    />
+                                    <Input
+                                        type={"select2"}
+                                        label="Catégorie du produit"
+                                        placeholder="Catégorie du produit"
+                                        name={"categorie"}
+                                        formik={formik}
+                                        options={categories}
+                                    />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"text"}
+                                        label="Taille"
+                                        placeholder="Taille du produit"
+                                        name={"taille"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Couleur"
+                                        placeholder="Couleur du produit"
+                                        name={"couleur"}
+                                        formik={formik}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button

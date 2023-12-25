@@ -20,7 +20,8 @@ class PartenaireController extends Controller
      */
     public function index()
     {
-        $data = Partenaire::where("is_deleted", false)->get();
+        //$data = Partenaire::where("is_deleted", false)->get();
+        $data = Partenaire::all();
 
 
         if ($data->isEmpty()) {
@@ -52,9 +53,8 @@ class PartenaireController extends Controller
             'telephone_boutique_2' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'telephone_boutique_3' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'latitude' => 'nullable|string|max:255',
-            'longitute' => 'nullable|string|max:255',
-            'heure_ouverture' => 'nullable|string|max:255',
-            'heure_fermeture' => 'nullable|string|max:255',
+            'longitude' => 'nullable|string|max:255',
+            'jour_ouverture' => 'nullable|string|max:1000',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string|max:1000',
         ]);
@@ -83,9 +83,8 @@ class PartenaireController extends Controller
                     'telephone_boutique_2' => $request->input('telephone_boutique_2'),
                     'telephone_boutique_3' => $request->input('telephone_boutique_3'),
                     'latitude' => $request->input('latitude'),
-                    'longitute' => $request->input('longitute'),
-                    'heure_ouverture' => $request->input('heure_ouverture'),
-                    'heure_fermeture' => $request->input('heure_fermeture'),
+                    'longitude' => $request->input('longitude'),
+                    'jour_ouverture' => $request->input('jour_ouverture'),
                     'description' => $request->input('description'),
                     'image' => 'partenaires/' . $imageName,
                     'slug' => Str::random(8),
@@ -115,7 +114,7 @@ class PartenaireController extends Controller
         }
 
         if ($data->is_deleted) {
-            return response()->json(['message' => 'Partenaire supprimé'], 404);
+            //return response()->json(['message' => 'Partenaire supprimé'], 404);
         }
 
         return response()->json(['message' => 'Partenaire trouvée', 'data' => $data], 200);
@@ -143,9 +142,8 @@ class PartenaireController extends Controller
             'telephone_boutique_2' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'telephone_boutique_3' => 'nullable|integer|digits:8|starts_with:2,5,6,7,01,02,03,05,06,07',
             'latitude' => 'nullable|string|max:255',
-            'longitute' => 'nullable|string|max:255',
-            'heure_ouverture' => 'nullable|string|max:255',
-            'heure_fermeture' => 'nullable|string|max:255',
+            'longitude' => 'nullable|string|max:255',
+            'jour_ouverture' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string|max:1000',
         ]);
@@ -172,9 +170,8 @@ class PartenaireController extends Controller
             'telephone_boutique_2' => $request->input('telephone_boutique_2'),
             'telephone_boutique_3' => $request->input('telephone_boutique_3'),
             'latitude' => $request->input('latitude'),
-            'longitute' => $request->input('longitute'),
-            'heure_ouverture' => $request->input('heure_ouverture'),
-            'heure_fermeture' => $request->input('heure_fermeture'),
+            'longitude' => $request->input('longitude'),
+            'jour_ouverture' => $request->input('jour_ouverture'),
             'description' => $request->input('description'),
         ]);
 
@@ -208,14 +205,15 @@ class PartenaireController extends Controller
     public function destroy($slug)
     {
         // Trouver la catégorie de maison à supprimer
-        $data = Partenaire::where("slug",$slug)->where("is_deleted",false)->first();
+        //$data = Partenaire::where("slug",$slug)->where("is_deleted",false)->first();
+        $data = Partenaire::where("slug",$slug)->first();
         if (!$data) {
             return response()->json(['message' => 'Partenaire non trouvé'], 404);
         }
 
 
         // Supprimer la catégorie de maison
-        $data->update(["is_deleted" => true]);
+        $data->update(["is_deleted" => !$data->is_deleted ]);
 
         return response()->json(['message' => 'Partenaire supprimée avec succès']);
     }

@@ -18,6 +18,7 @@ class ProduitVariante extends Model
         "disponibilite",
         "quantite_min",
         "dure_livraison",
+        "prix_promotion",
         "description",
         "slug",
         "is_deleted",

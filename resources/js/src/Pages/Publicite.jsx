@@ -139,8 +139,21 @@ export const Publicite = () => {
                         <div className="modal-body text-start">
                             <Input
                                 type={"text"}
-                                placeholder="Nom du produit"
+                                placeholder="Nom de l'entreprise"
                                 name={"nom"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"date"}
+                                label="Date de début"
+                                placeholder=""
+                                name={"dateDebut"}
+                                formik={formik}
+                            />
+                            <Input
+                                type={"date"}
+                                label="Date de fin"
+                                name={"dateFin"}
                                 formik={formik}
                             />
                             <Input

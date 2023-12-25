@@ -12,6 +12,7 @@ use App\Models\Produit;
 use App\Models\Partenaire;
 use App\Models\Categorie;
 use App\Models\ProduitImage;
+use App\Models\ProduitVariante;
 
 
 class ProduitController extends Controller
@@ -54,7 +55,8 @@ class ProduitController extends Controller
             'categorie' => 'required|string|max:8',
             //'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
-            'description' => 'required|string|max:1000',
+            'variante' => 'required|string|max:1000',
+            'description' => 'nullable|string|max:1000',
         ]);
         
         if ($validator->fails()) {
@@ -80,6 +82,7 @@ class ProduitController extends Controller
             'disponibilite' => $request->input('disponibilite'),
             'dure_livraison' => $request->input('dure_livraison'),
             'quantite_min' => $request->input('quantite_min'),
+            'variante' => $request->input('variante'),
             'categorie_id' => $categorie->id,
             'partenaire_id' => $partenaire->id,
             'description' => $request->input('description'),
@@ -174,6 +177,7 @@ class ProduitController extends Controller
             //'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/mp4,video/quicktime|max:102400',
             'description' => 'required|string|max:1000',
+            'variante' => 'nullable|string|max:1000',
         ]);
         
         if ($validator->fails()) {
@@ -199,6 +203,7 @@ class ProduitController extends Controller
             'stock' => $request->input('stock'),
             'disponibilite' => $request->input('disponibilite'),
             'dure_livraison' => $request->input('dure_livraison'),
+            'variante' => $request->input('variante'),
             'categorie_id' => $categorie->id,
             'description' => $request->input('description'),
         ]);
@@ -240,14 +245,14 @@ class ProduitController extends Controller
                 //Storage::delete($data->image);
                 File::delete(public_path($data->video));
                 $data->update([
-                    'name' => $request->video->getMimeType(),
+                    
                     'video' => 'videos/' . $videoName,
                 ]);
 
             }
         }
 
-        return response()->json(['message' => 'Partenaire modifié avec succès', 'data' => $data], 200);
+        return response()->json(['message' => 'Produit modifié avec succès', 'data' => $data], 200);
 
     }
 
@@ -271,4 +276,102 @@ class ProduitController extends Controller
 
         return response()->json(['message' => 'Produit supprimée avec succès']);
     }
+
+    public function allPromotion (Request $request){
+        // Vérifier que les champs obligatoires sont remplis
+        $validator = Validator::make($request->all(), [
+           'slug' => 'required|string|max:255',
+           'prix_promotion' => 'required|string|max:255',
+           'debut_promotion' => 'required|string|max:255',
+           'fin_promotion' => 'required|string|max:255',
+           'type_promotion' => 'required|string|max:255',
+
+           
+       ]);
+       
+       if ($validator->fails()) {
+           return response(['errors' => $validator->errors()->all()], 422);
+       }
+
+       dd($request->all());
+
+
+   }
+
+    public function promotion (Request $request){
+         // Vérifier que les champs obligatoires sont remplis
+         $validator = Validator::make($request->all(), [
+            'slug' => 'required|string|max:255',
+            'prix_promotion' => 'required|string|max:255',
+            'debut_promotion' => 'required|date|after_or_equal:today|max:255',
+            'fin_promotion' => 'required|date|after:debut_promotion|max:255',
+            'type_promotion' => 'required|string|max:255',
+        ]);
+        
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+
+
+        $data = Produit::where("slug", $request->slug)->where("is_deleted",false)->first();
+
+        if (!$data) {
+            return response()->json(['message' => 'Produit non trouvé'], 404);
+        }
+
+        //dd($request->all());
+
+        $data->update([
+            'type_promotion' => $request->input('type_promotion'),
+            'prix_promotion' => $request->input('prix_promotion'),
+            'debut_promotion' => $request->input('debut_promotion'),
+            'fin_promotion' => $request->input('fin_promotion'),
+            'etat_promotion' => "en_attente",
+        ]);
+
+
+
+        foreach($request->variantes as $variante){
+            $item = ProduitVariante::where([
+                "slug" => $variante['slug'],
+                "produit_id" => $data->id,
+            ])->first();
+
+            if($item){
+                $item->update([
+                    'prix_promotion' => $variante['prix_promotion'],
+                ]);
+            }
+        }
+        return response()->json(['message' => 'Promotion modifiée avec succès', 'data' => $data], 200);
+
+    }
+    public function destroyPromotion ($slug){
+
+       $data = Produit::where("slug", $slug)->where("is_deleted",false)->first();
+
+       if (!$data) {
+           return response()->json(['message' => 'Produit non trouvé'], 404);
+       }
+
+       //dd($request->all());
+
+       $data->update([
+           'type_promotion' => null,
+           'prix_promotion' => null,
+           'debut_promotion' => null,
+           'fin_promotion' => null,
+           'etat_promotion' => "pas_de_promotion",
+       ]);
+
+       $variantes = ProduitVariante::where(["produit_id" => $data->id])->get();
+
+       foreach($variantes as $variante){
+            $variante->update([
+                'prix_promotion' => null,
+            ]);
+       }
+       return response()->json(['message' => 'Promotion modifiée avec succès', 'data' => $data], 200);
+
+   }
 }

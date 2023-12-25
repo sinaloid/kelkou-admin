@@ -46,6 +46,11 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
         Route::post('/users/disable', [AuthController::class,'disable']);
         Route::post('/users/role', [AuthController::class,'role']);
         Route::get('/users/{type}', [AuthController::class,'index']);
+
+        Route::post('/promotions', [ProduitController::class,'promotion']);
+        Route::get('/promotions', [ProduitController::class,'allPromotion']);
+        Route::delete('/promotions/{type}', [ProduitController::class,'destroyPromotion']);
+
         Route::resources([
             'categories' => CategorieController::class,
             'partenaires' => PartenaireController::class,

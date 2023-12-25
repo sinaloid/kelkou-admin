@@ -9,7 +9,7 @@ import endPoint from "../../services/endPoint";
 import request, { URL } from "../../services/request";
 import { Input } from "../../components/Input";
 import { useFormik } from "formik";
-import { pagination } from "../../services/function";
+import { pagination, variante } from "../../services/function";
 import { useParams } from "react-router-dom";
 import { Video } from "../../components/Video";
 import ReactPlayer from "react-player";
@@ -25,6 +25,8 @@ const initData = {
     description: "",
     partenaire: "",
     categorie: "",
+    taille: "",
+    couleur: "",
 };
 export const DetailPartenaire = () => {
     const [datas, setDatas] = useState({
@@ -51,11 +53,12 @@ export const DetailPartenaire = () => {
         initialValues: initData,
         onSubmit: (values) => {
             console.log(values);
+            const newValues = variante(values)
             if (values.slug) {
-                update(values);
+                update(newValues);
             } else {
                 values.partenaire = detail.slug;
-                post(values);
+                post(newValues);
             }
         },
     });
@@ -64,8 +67,12 @@ export const DetailPartenaire = () => {
         request
             .get(endPoint.partenaires + "/" + slug)
             .then((res) => {
-                console.log(res.data.data);
+                res.data.data.jour_ouverture = JSON.parse(
+                    res.data.data.jour_ouverture
+                );
                 setDetail(res.data.data);
+                console.log(res.data.data);
+
                 const tab = pagination(res.data.data.produits, 10);
 
                 //console.log(tab);
@@ -151,6 +158,7 @@ export const DetailPartenaire = () => {
         e.preventDefault();
         //setVideoUrl(URL + data.video);
         console.log(data);
+        data.variante = JSON.parse(data.variante);
         setViewData(data);
     };
 
@@ -166,6 +174,10 @@ export const DetailPartenaire = () => {
         formik.setFieldValue("dure_livraison", data.dure_livraison);
         formik.setFieldValue("categorie", data.categorie.slug);
         formik.setFieldValue("description", data.description);
+        data.variante = JSON.parse(data.variante);
+
+        formik.setFieldValue("taille", data.variante.taille);
+        formik.setFieldValue("couleur", data.variante.couleur);
     };
     return (
         <>
@@ -250,18 +262,23 @@ export const DetailPartenaire = () => {
                         {new Date(detail.created_at).toLocaleDateString()}
                     </div>
                     <div>
-                        <div className="d-inline-block me-2">
-                            <span>Heure d'ouverture : </span>{" "}
-                            <span className="fw-bold">
-                                {detail.heure_ouverture}
-                            </span>
-                        </div>
-                        <div className="d-inline-block me-2">
-                            <span>Heure femeture : </span>{" "}
-                            <span className="fw-bold">
-                                {detail.heure_fermeture}
-                            </span>
-                        </div>
+                    <span>Jours d'ouvertures</span>
+
+                        {detail.jour_ouverture && Object.keys(detail.jour_ouverture).map((key, idx) => {
+                            if(detail.jour_ouverture[key].ouverture === "" || detail.jour_ouverture[key].fermeture === ""){
+                                return
+                            }
+                            return (
+                                <div>
+                                    <div className="d-inline-block me-2">
+                                        <span>{key} de : </span>{" "}
+                                        <span className="fw-bold">
+                                            {detail.jour_ouverture[key].ouverture} à {detail.jour_ouverture[key].fermeture}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                     <p className="text-start">{detail.description}</p>
                 </div>
@@ -413,7 +430,7 @@ export const DetailPartenaire = () => {
             </div>
 
             <div
-                className="modal fade"
+                className="modal modal-lg fade"
                 id="produit"
                 tabindex="-1"
                 aria-labelledby="exampleModalLabel"
@@ -435,77 +452,119 @@ export const DetailPartenaire = () => {
                                 aria-label="Close"
                             ></button>
                         </div>
-                        <div className="modal-body">
-                            <Input
-                                type={"text"}
-                                placeholder="Nom du produit"
-                                name={"nom"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Prix du produit"
-                                name={"prix"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Quantité en stock"
-                                name={"stock"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Dure de livraison du produit"
-                                name={"dure_livraison"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Quantite minimum du produit"
-                                name={"quantite_min"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"select"}
-                                placeholder="Disponibilié du produit"
-                                name={"disponibilite"}
-                                formik={formik}
-                                options={[
-                                    { slug: "immediate", nom: "Immediate" },
-                                    {
-                                        slug: "sur commande",
-                                        nom: "Sur commande",
-                                    },
-                                ]}
-                            />
-                            <Input
-                                type={"select2"}
-                                placeholder="Catégorie du produit"
-                                name={"categorie"}
-                                formik={formik}
-                                options={categories}
-                            />
-                            <Input
-                                type={"files"}
-                                label="Images du produit"
-                                placeholder="Images du produit"
-                                name={"files"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"file"}
-                                label="Courte video du produit"
-                                placeholder="Courte video du produit"
-                                name={"video"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"textarea"}
-                                placeholder="Description du produit"
-                                name={"description"}
-                                formik={formik}
-                            />
+                        <div className="modal-body text-start">
+                            <div className="row">
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"text"}
+                                        label="Nom du produit"
+                                        placeholder="Nom du produit"
+                                        name={"nom"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Prix du produit"
+                                        placeholder="Prix du produit"
+                                        name={"prix"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Quantité en stock"
+                                        placeholder="Quantité en stock"
+                                        name={"stock"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Quantité en minimum du produit"
+                                        placeholder="Quantité en minimum du produit"
+                                        name={"quantite_min"}
+                                        formik={formik}
+                                    />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"files"}
+                                        label="Images du produit"
+                                        placeholder="Images du produit"
+                                        name={"files"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"file"}
+                                        label="Courte video du produit"
+                                        placeholder="Courte video du produit"
+                                        name={"video"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"textarea"}
+                                        label="Description du produit"
+                                        placeholder="Description du produit"
+                                        name={"description"}
+                                        formik={formik}
+                                    />
+                                </div>
+                            </div>
+                            <div className="row border-top pt-3">
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"select"}
+                                        label="Disponibilié du produit"
+                                        placeholder="Disponibilié du produit"
+                                        name={"disponibilite"}
+                                        formik={formik}
+                                        options={[
+                                            {
+                                                slug: "immediate",
+                                                nom: "Immediate",
+                                            },
+                                            {
+                                                slug: "sur commande",
+                                                nom: "Sur commande",
+                                            },
+                                        ]}
+                                    />
+                                    {formik.values["disponibilite"] === "sur commande" && (
+                                        <>
+                                            <Input
+                                                type={"text"}
+                                                label="Dure de livraison du produit"
+                                                placeholder="Dure de livraison du produit"
+                                                name={"dure_livraison"}
+                                                formik={formik}
+                                            />
+                                        </>
+                                    )}
+
+                                    <Input
+                                        type={"select2"}
+                                        label="Catégorie du produit"
+                                        placeholder="Catégorie du produit"
+                                        name={"categorie"}
+                                        formik={formik}
+                                        options={categories}
+                                    />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"text"}
+                                        label="Taille"
+                                        placeholder="Taille du produit"
+                                        name={"taille"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Couleur"
+                                        placeholder="Couleur du produit"
+                                        name={"couleur"}
+                                        formik={formik}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button
@@ -659,6 +718,22 @@ export const DetailPartenaire = () => {
                                             {viewData.dure_livraison +
                                                 " jour(s)"}
                                         </span>
+                                    </div>
+                                    <div>
+                                        <span>Taille : </span>
+                                        <span className="fw-bold">
+                                            {viewData.variante?.taille}
+                                        </span>{" "}
+                                        <br />
+                                        <span>Couleur : </span>
+                                        <span
+                                            className="rectangle"
+                                            style={{
+                                                backgroundColor:
+                                                viewData.variante?.couleur,
+                                            }}
+                                        ></span>{" "}
+                                        <br />
                                     </div>
                                     <div>
                                         <span className="fw-bold">

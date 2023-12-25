@@ -596,9 +596,13 @@ export const Personnel = () => {
                                 name={"role"}
                                 formik={formikRole}
                                 options={[
+                                    { slug: "manager", nom: "Manager" },
                                     { slug: "secretaire", nom: "Secretaire" },
+                                    { slug: "marketing",nom: "Marketing",},
                                     { slug: "comptable",nom: "Comptable",},
                                     { slug: "gestionnaire",nom: "Gestionnaire",},
+                                    { slug: "communication",nom: "Communication",},
+
                                 ]}
                             />
                         </div>

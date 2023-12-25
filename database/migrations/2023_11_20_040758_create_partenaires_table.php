@@ -25,12 +25,11 @@ return new class extends Migration
             $table->string('telephone_boutique_1')->nullable();
             $table->string('telephone_boutique_2')->nullable();
             $table->string('telephone_boutique_3')->nullable();
-
-            $table->string('heure_ouverture')->nullable();
-            $table->string('heure_fermeture')->nullable();
+            
+            $table->json('jour_ouverture')->nullable();
 
             $table->string('latitude')->nullable();
-            $table->string('longitute')->nullable();
+            $table->string('longitude')->nullable();
             $table->string('slug');
             $table->string('image')->nullable();
             $table->longText('description')->nullable();

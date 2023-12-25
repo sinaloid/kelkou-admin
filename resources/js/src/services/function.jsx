@@ -74,4 +74,15 @@ const pagination = (datas, pageNumber = 6) => {
     };
 };
 
-export { makeSearch, formatDate,pagination };
+const variante = (values) => {
+    const variante = {
+        taille: values.taille,
+        couleur: values.couleur,
+    };
+
+    values.variante = JSON.stringify(variante);
+
+    return values;
+};
+
+export { makeSearch, formatDate,pagination,variante };

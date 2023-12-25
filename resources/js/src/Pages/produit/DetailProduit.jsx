@@ -25,6 +25,12 @@ const initData = {
     description: "",
     partenaire: "",
     categorie: "",
+    taille: "",
+    couleur: "",
+    debut_promotion: "",
+    fin_promotion: "",
+    type_promotion: "",
+    prix_promotion: "",
 };
 export const DetailProduit = () => {
     const [datas, setDatas] = useState({
@@ -38,6 +44,7 @@ export const DetailProduit = () => {
     });
     const [categories, setCategories] = useState([]);
     const close = useRef();
+    const closePromo = useRef();
     const closeDelete = useRef();
     const [detail, setDetail] = useState("");
     const [viewData, setViewData] = useState({ produit_images: [] });
@@ -51,23 +58,64 @@ export const DetailProduit = () => {
         initialValues: initData,
         onSubmit: (values) => {
             console.log(values);
-            values.variante = JSON.stringify("variante");
+            //values.variante = JSON.stringify("variante");
+            const newValues = variante(values);
 
             if (values.slug) {
-                update(values);
+                update(newValues);
             } else {
                 values.produit = detail.slug;
 
-                post(values);
+                post(newValues);
             }
         },
     });
+
+    const formikPromo = useFormik({
+        initialValues: initData,
+        onSubmit: (values) => {
+            //console.log(values);
+            //values.variante = JSON.stringify("variante");
+            //const newValues = variante(values);
+
+            const promo = detail.produit_variantes.map((data) => {
+                return {
+                    slug: data.slug,
+                    prix_promotion: values[data.slug],
+                };
+            });
+
+            const produit = {
+                slug: slug,
+                debut_promotion: values.debut_promotion,
+                fin_promotion: values.fin_promotion,
+                type_promotion: values.type_promotion,
+                prix_promotion: values.prix_promotion,
+                variantes: promo,
+            };
+
+            //console.log(produit);
+            postPromotion(produit)
+        },
+    });
+
+    const variante = (values) => {
+        const variante = {
+            taille: values.taille,
+            couleur: values.couleur,
+        };
+
+        values.variante = JSON.stringify(variante);
+
+        return values;
+    };
 
     const get = () => {
         request
             .get(endPoint.produits + "/" + slug)
             .then((res) => {
                 console.log(res.data.data);
+                res.data.data.variante = JSON.parse(res.data.data.variante);
                 setDetail(res.data.data);
                 const tab = pagination(res.data.data.produit_variantes, 10);
 
@@ -125,12 +173,38 @@ export const DetailProduit = () => {
             });
     };
 
+    const postPromotion = (values) => {
+        //console.log(values);
+        request
+            .post(endPoint.promotions, values)
+            .then((res) => {
+                console.log(res.data);
+                closePromo.current.click();
+                get();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
     const destroy = () => {
         request
             .delete(endPoint.produitVariantes + "/" + viewData.slug)
             .then((res) => {
                 console.log(res.data);
                 closeDelete.current.click();
+                get();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const destroyPromotion = () => {
+        request
+            .delete(endPoint.promotions + "/" + slug)
+            .then((res) => {
+                console.log(res.data);
+                //closeDelete.current.click();
                 get();
             })
             .catch((error) => {
@@ -155,6 +229,7 @@ export const DetailProduit = () => {
         e.preventDefault();
         //setVideoUrl(URL + data.video);
         console.log(data);
+        data.variante = JSON.parse(data.variante);
         setViewData(data);
     };
 
@@ -170,6 +245,10 @@ export const DetailProduit = () => {
         formik.setFieldValue("quantite_min", data.quantite_min);
         formik.setFieldValue("dure_livraison", data.dure_livraison);
         formik.setFieldValue("description", data.description);
+        data.variante = JSON.parse(data.variante);
+
+        formik.setFieldValue("taille", data.variante.taille);
+        formik.setFieldValue("couleur", data.variante.couleur);
     };
     return (
         <>
@@ -213,15 +292,34 @@ export const DetailProduit = () => {
                                     {detail.quantite_min}
                                 </span>{" "}
                                 <br />
-                                <span>En promotion : </span>
+                                <span>Type promotion : </span>
                                 <span className="fw-bold">
-                                    {detail.is_promotion ? "Oui" : "Non"}
+                                    {detail.type_promotion}
                                 </span>{" "}
                                 <br />
                                 <span>Etat promotion : </span>
                                 <span className="fw-bold">
                                     {detail.etat_promotion}
                                 </span>{" "}
+                                <br />
+                                <span>Prix promotion : </span>
+                                <span className="fw-bold">
+                                    {detail.prix_promotion + " Xof"}
+                                </span>{" "}
+                                <br />
+                                <span>Taille : </span>
+                                <span className="fw-bold">
+                                    {detail.variante?.taille}
+                                </span>{" "}
+                                <br />
+                                <span>Couleur : </span>
+                                <span
+                                    className="rectangle"
+                                    style={{
+                                        backgroundColor:
+                                            detail.variante?.couleur,
+                                    }}
+                                ></span>{" "}
                                 <br />
                             </div>
                         </div>
@@ -266,27 +364,36 @@ export const DetailProduit = () => {
                                     <br />
                                 </div>{" "}
                                 <br />
-                                <div className="d-inline-block me-2">
-                                    <span>Heure d'ouverture : </span>{" "}
-                                    <span className="fw-bold">
-                                        {detail.partenaire?.heure_ouverture}
-                                    </span>
-                                </div>
-                                <br />
-                                <div className="d-inline-block me-2">
-                                    <span>Heure femeture : </span>{" "}
-                                    <span className="fw-bold">
-                                        {detail.partenaire?.heure_fermeture}
-                                    </span>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="col-12 text-start">
-                    <div className="text-muted mb-3">
-                        Créer le :{" "}
-                        {new Date(detail.created_at).toLocaleDateString()}
+                    <div className="d-flex">
+                        <span className="text-muted mb-3 me-auto">
+                            Créer le :{" "}
+                            {new Date(detail.created_at).toLocaleDateString()}
+                        </span>
+                        {detail.prix_promotion && (
+                            <>
+                                <button
+                                    className="btn btn-danger me-2"
+                                    onClick={e => {
+                                        e.preventDefault()
+                                        destroyPromotion()
+                                    }}
+                                >
+                                    Supprimer la promotion
+                                </button>
+                            </>
+                        )}
+                        <button
+                                    className="btn btn-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#promotion"
+                                >
+                                    Faire une promotion
+                                </button>
                     </div>
                     <div className="d-flex flex-wrap mb-3">
                         {detail.produit_images?.map((data) => {
@@ -318,7 +425,7 @@ export const DetailProduit = () => {
             <div className="row mb-3">
                 <div className="col-12">
                     <h1 className="text-start mb-3 fs-30">
-                        Liste des produits de la boutique
+                        Liste des variantes du produit
                     </h1>
                     <div className="d-flex">
                         <div className="d-flex align-items-center me-auto">
@@ -372,9 +479,9 @@ export const DetailProduit = () => {
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Catégories</th>
-                                <th scope="col">Quantité min</th>
-                                <th scope="col">Description</th>
+                                <th scope="col">Produit</th>
+                                <th scope="col">Prix</th>
+                                <th scope="col">Prix promotion</th>
                                 <th scope="col">Date</th>
                                 <th scope="col">Action</th>
                             </tr>
@@ -405,12 +512,12 @@ export const DetailProduit = () => {
                                         </td>
                                         <td>
                                             <p className="text-200">
-                                                {data.quantite_min}
+                                                {data.prix + " Xof"}
                                             </p>
                                         </td>
                                         <td>
                                             <p className="text-200">
-                                                {data.description}
+                                                {data.prix_promotion + " Xof"}
                                             </p>
                                         </td>
                                         <td>
@@ -461,7 +568,7 @@ export const DetailProduit = () => {
             </div>
 
             <div
-                className="modal fade"
+                className="modal modal-lg fade"
                 id="produit"
                 tabindex="-1"
                 aria-labelledby="exampleModalLabel"
@@ -474,7 +581,7 @@ export const DetailProduit = () => {
                                 className="modal-title fs-5"
                                 id="exampleModalLabel"
                             >
-                                Ajout d'un nouveau produit
+                                Ajout d'une nouvelle variante
                             </h1>
                             <button
                                 type="button"
@@ -483,71 +590,111 @@ export const DetailProduit = () => {
                                 aria-label="Close"
                             ></button>
                         </div>
-                        <div className="modal-body">
-                            <Input
-                                type={"text"}
-                                placeholder="Nom du produit"
-                                name={"nom"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Prix du produit"
-                                name={"prix"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Quantité en stock"
-                                name={"stock"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Dure de livraison du produit"
-                                name={"dure_livraison"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"text"}
-                                placeholder="Quantite minimum du produit"
-                                name={"quantite_min"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"select"}
-                                placeholder="Disponibilié du produit"
-                                name={"disponibilite"}
-                                formik={formik}
-                                options={[
-                                    { slug: "immediate", nom: "Immediate" },
-                                    {
-                                        slug: "sur commande",
-                                        nom: "Sur commande",
-                                    },
-                                ]}
-                            />
-                            
-                            <Input
-                                type={"files"}
-                                label="Images du produit"
-                                placeholder="Images du produit"
-                                name={"files"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"file"}
-                                label="Courte video du produit"
-                                placeholder="Courte video du produit"
-                                name={"video"}
-                                formik={formik}
-                            />
-                            <Input
-                                type={"textarea"}
-                                placeholder="Description du produit"
-                                name={"description"}
-                                formik={formik}
-                            />
+                        <div className="modal-body text-start">
+                            <div className="row">
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"text"}
+                                        label="Nom du produit"
+                                        placeholder="Nom du produit"
+                                        name={"nom"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Prix du produit"
+                                        placeholder="Prix du produit"
+                                        name={"prix"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Quantité en stock"
+                                        placeholder="Quantité en stock"
+                                        name={"stock"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Quantité en minimum du produit"
+                                        placeholder="Quantité en minimum du produit"
+                                        name={"quantite_min"}
+                                        formik={formik}
+                                    />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"files"}
+                                        label="Images du produit"
+                                        placeholder="Images du produit"
+                                        name={"files"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"file"}
+                                        label="Courte video du produit"
+                                        placeholder="Courte video du produit"
+                                        name={"video"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"textarea"}
+                                        label="Description du produit"
+                                        placeholder="Description du produit"
+                                        name={"description"}
+                                        formik={formik}
+                                    />
+                                </div>
+                            </div>
+                            <div className="row border-top pt-3">
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"select"}
+                                        label="Disponibilié du produit"
+                                        placeholder="Disponibilié du produit"
+                                        name={"disponibilite"}
+                                        formik={formik}
+                                        options={[
+                                            {
+                                                slug: "immediate",
+                                                nom: "Immediate",
+                                            },
+                                            {
+                                                slug: "sur commande",
+                                                nom: "Sur commande",
+                                            },
+                                        ]}
+                                    />
+                                    {formik.values["disponibilite"] ===
+                                        "sur commande" && (
+                                        <>
+                                            <Input
+                                                type={"text"}
+                                                label="Dure de livraison du produit"
+                                                placeholder="Dure de livraison du produit"
+                                                name={"dure_livraison"}
+                                                formik={formik}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        type={"text"}
+                                        label="Taille"
+                                        placeholder="Taille du produit"
+                                        name={"taille"}
+                                        formik={formik}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Couleur"
+                                        placeholder="Couleur du produit"
+                                        name={"couleur"}
+                                        formik={formik}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button
@@ -695,6 +842,28 @@ export const DetailProduit = () => {
                                         </span>
                                     </div>
                                     <div>
+                                        <span>Prix promotion : </span>
+                                        <span className="fw-bold">
+                                            {viewData.prix_promotion + " Xof"}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span>Taille : </span>
+                                        <span className="fw-bold">
+                                            {viewData.variante?.taille}
+                                        </span>{" "}
+                                        <br />
+                                        <span>Couleur : </span>
+                                        <span
+                                            className="rectangle"
+                                            style={{
+                                                backgroundColor:
+                                                    viewData.variante?.couleur,
+                                            }}
+                                        ></span>{" "}
+                                        <br />
+                                    </div>
+                                    <div>
                                         <span className="fw-bold">
                                             Description :{" "}
                                         </span>
@@ -719,6 +888,114 @@ export const DetailProduit = () => {
                                 data-bs-dismiss="modal"
                             >
                                 Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                className="modal modal-lg fade"
+                id="promotion"
+                tabindex="-1"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1
+                                className="modal-title fs-5"
+                                id="exampleModalLabel"
+                            >
+                                Ajout le produit en promotion
+                            </h1>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div className="modal-body text-start">
+                            <div className="row">
+                                <div className="col-12 col-md-6">
+                                    <span className="fw-bold fs-18 mb-3">
+                                        Informations générale
+                                    </span>
+                                    <Input
+                                        type={"select"}
+                                        label="Type de la promotion"
+                                        placeholder="Type de la promotion"
+                                        name={"type_promotion"}
+                                        formik={formikPromo}
+                                        options={[
+                                            {
+                                                slug: "promotion_simple",
+                                                nom: "Promotion simple",
+                                            },
+                                            {
+                                                slug: "vente_chaude",
+                                                nom: "Vente chaude",
+                                            },
+                                        ]}
+                                    />
+                                    <Input
+                                        type={"date"}
+                                        label={"Date de debut de la promotion"}
+                                        placeholder="Date de debut de la promotion"
+                                        name={"debut_promotion"}
+                                        formik={formikPromo}
+                                    />
+                                    <Input
+                                        type={"date"}
+                                        label={"Date de fin de la promotion"}
+                                        placeholder="Date de fin de la promotion"
+                                        name={"fin_promotion"}
+                                        formik={formikPromo}
+                                    />
+                                    <Input
+                                        type={"text"}
+                                        label="Prix promotion"
+                                        placeholder="Prix promotion"
+                                        name={"prix_promotion"}
+                                        formik={formikPromo}
+                                    />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <span className="fw-bold fs-18 mb-3">
+                                        Prix promotion des variantes
+                                    </span>
+                                    {detail.produit_variantes?.map((data) => {
+                                        return (
+                                            <div key={data.slug}>
+                                                <Input
+                                                    type={"text"}
+                                                    label={data.nom}
+                                                    placeholder="Prix promotion"
+                                                    name={data.slug}
+                                                    formik={formikPromo}
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                                ref={closePromo}
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={formikPromo.handleSubmit}
+                            >
+                                Enregistrer
                             </button>
                         </div>
                     </div>

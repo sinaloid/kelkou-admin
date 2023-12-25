@@ -109,3 +109,9 @@ thead{
   width: 200px; /* Largeur de votre conteneur de texte */
 }
 
+.rectangle{
+  display: inline-block;
+  width: 64px;
+  height: 9px;
+}
+

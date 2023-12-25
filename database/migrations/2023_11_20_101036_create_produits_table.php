@@ -20,15 +20,16 @@ return new class extends Migration
             $table->string('stock')->nullable();
             $table->string('video')->nullable();
             //$table->json('content')->nullable();
+            $table->json('variante')->nullable();
             $table->string('disponibilite')->nullable();
             $table->string('quantite_min')->nullable();
             $table->string('dure_livraison')->nullable();
             $table->longText('description')->nullable();
             
-            $table->boolean("is_promotion")->default(false);
-            $table->string("etat_promotion")->default("Pas de promotion");
-            $table->string('debut_promotion')->nullable();
-            $table->string('fin_promotion')->nullable();
+            $table->string('type_promotion')->nullable();
+            $table->string("etat_promotion")->default("pas_de_promotion");
+            $table->date('debut_promotion')->nullable();
+            $table->date('fin_promotion')->nullable();
             $table->string('prix_promotion')->nullable();
 
 
