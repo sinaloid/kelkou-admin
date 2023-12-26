@@ -550,6 +550,12 @@ export const Personnel = () => {
                                             {viewData.genre}
                                         </span>
                                     </div>
+                                    <div>
+                                        <span>Référence : </span>
+                                        <span className="fw-bold">
+                                            {viewData.reference}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -72,6 +72,7 @@ class PartenaireController extends Controller
 
             if ($imagePath) {
                 $data = Partenaire::create([
+                    'reference' => "KEL-PAR-".date('YmdHis'),
                     'nom_responsable' => $request->input('nom_responsable'),
                     'email_responsable' => $request->input('email_responsable'),
                     'telephone_responsable_1' => $request->input('telephone_responsable_1'),

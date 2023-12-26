@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('dure_livraison')->nullable();
             $table->longText('description')->nullable();
             $table->string('prix_promotion')->nullable();
+            $table->string('reference')->nullable();
+
             
             $table->string('slug');
             $table->boolean("is_deleted")->default(false);

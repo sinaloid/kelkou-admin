@@ -7,6 +7,7 @@ const endPoint = {
   produitVariantes:"produitVariantes",
   commandes:"commandes",
   promotions:"promotions",
+  paiements:"paiements",
   users:"users"
 
 

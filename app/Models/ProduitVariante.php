@@ -15,6 +15,7 @@ class ProduitVariante extends Model
         "stock",
         "video",
         "variante",
+        "reference",
         "disponibilite",
         "quantite_min",
         "dure_livraison",

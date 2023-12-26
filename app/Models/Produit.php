@@ -23,6 +23,7 @@ class Produit extends Model
         "debut_promotion",
         "fin_promotion",
         "prix_promotion",
+        "reference",
         "slug",
         "is_deleted",
         "partenaire_id",

@@ -68,6 +68,7 @@ class ProduitVarianteController extends Controller
         }
 
         $data = ProduitVariante::create([
+            'reference' => "KEL-PRO-".date('YmdHis'),
             'nom' => $request->input('nom'),
             'prix' => $request->input('prix'),
             'stock' => $request->input('stock'),

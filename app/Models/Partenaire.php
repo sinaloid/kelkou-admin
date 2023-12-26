@@ -26,6 +26,7 @@ class Partenaire extends Model
         "slug",
         "image",
         "description",
+        "reference",
         "is_deleted",
     ];
 

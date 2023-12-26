@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('genre');
             $table->string('isActive')->nullable();
             $table->string('isPartenaire')->nullable();
+            $table->string('reference')->nullable();
             $table->string('slug')->nullable();
             $table->string('role')->nullable();
             $table->string('engin_immatriculation')->nullable();

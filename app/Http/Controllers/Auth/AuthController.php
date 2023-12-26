@@ -47,6 +47,7 @@ class AuthController extends Controller
                 'genre' => $request->genre,
                 'engin_immatriculation' => $request->engin_immatriculation,
                 //'role' => $request->role,
+                'reference' => "KEL-COMPTE-".date('YmdHis'),
                 'number' => $request->number,
                 'number_1' => $request->number_1,
                 'number_2' => $request->number_2,

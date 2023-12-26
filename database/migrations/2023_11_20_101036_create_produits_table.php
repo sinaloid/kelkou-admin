@@ -31,6 +31,7 @@ return new class extends Migration
             $table->date('debut_promotion')->nullable();
             $table->date('fin_promotion')->nullable();
             $table->string('prix_promotion')->nullable();
+            $table->string('reference')->nullable();
 
 
 

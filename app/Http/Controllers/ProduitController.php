@@ -76,6 +76,7 @@ class ProduitController extends Controller
         }
 
         $data = Produit::create([
+            'reference' => "KEL-PRO-".date('YmdHis'),
             'nom' => $request->input('nom'),
             'prix' => $request->input('prix'),
             'stock' => $request->input('stock'),
@@ -277,24 +278,19 @@ class ProduitController extends Controller
         return response()->json(['message' => 'Produit supprimée avec succès']);
     }
 
-    public function allPromotion (Request $request){
-        // Vérifier que les champs obligatoires sont remplis
-        $validator = Validator::make($request->all(), [
-           'slug' => 'required|string|max:255',
-           'prix_promotion' => 'required|string|max:255',
-           'debut_promotion' => 'required|string|max:255',
-           'fin_promotion' => 'required|string|max:255',
-           'type_promotion' => 'required|string|max:255',
+    public function allPromotion (){
 
-           
-       ]);
-       
-       if ($validator->fails()) {
-           return response(['errors' => $validator->errors()->all()], 422);
-       }
+        $data = Produit::with("categorie","partenaire","produitImages")->where([
+            "is_deleted" => false,
+            "etat_promotion" => "en_cours"
+        ])->get();
 
-       dd($request->all());
 
+        if ($data->isEmpty()) {
+            return response()->json(['message' => 'Aucun produit trouvé'], 404);
+        }
+
+        return response()->json(['message' => 'Produits récupérés', 'data' => $data], 200);
 
    }
 

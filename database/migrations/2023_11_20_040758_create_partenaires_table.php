@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('longitude')->nullable();
             $table->string('slug');
             $table->string('image')->nullable();
+            $table->string('reference')->nullable();
             $table->longText('description')->nullable();
             $table->boolean("is_deleted")->default(false);
 

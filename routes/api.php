@@ -9,6 +9,7 @@ use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProduitVarianteController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\DetailCommandeController;
+use App\Http\Controllers\PaiementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
             'produitVariantes' => ProduitVarianteController::class,
             'commandes' => CommandeController::class,
             'detailCommandes' => DetailCommandeController::class,
+            'paiements' => PaiementController::class,
         ]);
     });
 });
