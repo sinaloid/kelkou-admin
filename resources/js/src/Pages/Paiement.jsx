@@ -252,8 +252,8 @@ export const Paiement = () => {
                                         <td>
                                             {data.etat_paiement === "en_attente"
                                                 && <> <span className="badge text-bg-warning">En attente</span></>}
-                                            {data.etat_paiement === "recu"
-                                                && <> <span className="badge text-bg-success">Réçu</span></>}
+                                            {data.etat_paiement === "effectue"
+                                                && <> <span className="badge text-bg-success">Effectué</span></>}
                                             {data.etat_paiement === "annule"
                                                 && <> <span className="badge text-bg-danger">Annulé</span></>}    
                                        

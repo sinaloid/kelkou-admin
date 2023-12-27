@@ -6,7 +6,7 @@ const typePaiement = [
 
 const etatPaiement = [
     { slug: "en_attente", nom: "En attente" },
-    { slug: "recu", nom: "Réçu" },
+    { slug: "effectue", nom: "Effectué" },
     { slug: "annule", nom: "Annulé" },
 ]
 
